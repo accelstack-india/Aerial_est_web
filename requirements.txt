@@ -1,0 +1,5 @@
+Flask
+PyMySQL
+Markupsafe==1.1.1
+Flask-reCaptcha
+paypalrestsdk==1.1.0

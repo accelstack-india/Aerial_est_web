@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+       <style>
+.button {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button1 {border-radius: 2px;}
+.button2 {border-radius: 4px;}
+.button3 {border-radius: 8px;}
+.button4 {border-radius: 12px;}
+.button5 {border-radius: 50%;}
+</style>
+
+
+    <style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+</style>
+
+
+     <style>
+
+
+        .badge {
+  padding-left: 9px;
+  padding-right: 9px;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+.label-warning[href],
+.badge-warning[href] {
+  background-color: #c67605;
+}
+#lblCartCount {
+    font-size: 12px;
+    background: #ff0000;
+    color: #fff;
+    padding: 0 5px;
+    vertical-align: top;
+    margin-left: -10px;
+}
+
+
+        .circular {
+          border-radius: 50%;
+        }
+
+        .float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:#25d366;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+  font-size:30px;
+	box-shadow: 2px 2px 3px #999;
+  z-index:100;
+}
+
+.my-float{
+	margin-top:16px;
+}
+    </style>
+
+
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+
+  <title>{{ about_title }}</title>
+  <meta content="{{ aboutpagemeta }}" name="description">
+  <meta content="{{ aboutpagemetakeyword }}" name="keywords">
+    <meta name="robots" content="INDEX,FOLLOW">
+  <!-- Favicons -->
+{#  <link href="{{ url_for('static',filename='img/favicon.png') }}" rel="icon">#}
+{#  <link href="assets/img/favicon.png" rel="icon">#}
+  <link href="{{ url_for('static',filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+{#  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">#}
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static',filename='vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+  <!-- ======= Top Bar ======= -->
+  <section id="topbar" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+      <div class="contact-info d-flex align-items-center">
+        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">{{ companymail }}</a></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{ companyphone }}</span></i>
+      </div>
+      <div class="social-links d-none d-md-flex align-items-center">
+        <a href="{{ companytwitter }}" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="{{ companyfacebook }}" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="{{ companyinstagram }}" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="{{ companylinkedin }}" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <div class="logo">
+{#        <h1><a href="/">Eterna</a></h1>#}
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <a href="/"><img  src="{{ applogo }}" alt="" class="img-fluid"></a>
+      </div>
+
+            <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a class="active" href="/about">About</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/contact">Contact</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+          <li class="dropdown"><a href="#"><span>My Account</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+{#              <li><a href="#">Drop Down 1</a></li>#}
+                {% if userlogedin == True %}
+                    <div class="row">
+                    <div align="center">
+
+                    <h6>Welcome<br><b>{{ username }}</b></h6>
+                    </div>
+                    </div>
+                  <li><a href="/myorders">My Orders</a></li>
+                  <li><a href="/myaccount">My Account</a></li>
+                  <li><a href="/mywallet">My Wallet</a></li>
+                  <li><a href="/mygroups">My Groups</a></li>
+                  <li><a href="/userlogout">Logout</a></li>
+                {% endif %}
+             {% if userlogedin == False %}
+                  <li><a href="/userlogin">Login</a></li>
+                  <li><a href="/userregister">Register</a></li>
+                {% endif %}
+            </ul>
+          </li>
+          <li><a href="/ordernew">Order</a></li>
+          <li class="bi bi-cart d-flex align-items-center ms-4"><a href="/cart">Cart</a><span style="margin-left: 10px" class='badge badge-warning' id='lblCartCount'>{{ cartitems|length }}</span></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li>My Account</li>
+        </ol>
+        <h2>My Account</h2>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+      <div class="container">
+          <div class="row">
+          <div class="col-lg">
+          <form action="/myaccount" method="post" class="form-control">
+            <div class="col-md-6 form-group">
+              <label>First name</label>
+              <input class="form-control" value="{{ user[0] }}" name="firstname" placeholder="Enter your first name">
+              <label>Last name</label>
+              <input class="form-control" value="{{ user[1] }}" name="lastname" placeholder="Enter your last name">
+
+              <label>Secondary email</label>
+              <input  class="form-control" value="{{ user[7] }}" name="sec_email" placeholder="Enter your secondary email">
+              
+              <label>House Number</label>
+              <input class="form-control" value="{{ user[12] }}" name="hno" type="text" placeholder="House Number">
+
+              <label>Street Name</label>
+              <input class="form-control" value="{{ user[13] }}" name="street" type="text" placeholder="Street Name">
+
+              <label>City</label>
+              <input class="form-control" value="{{ user[14] }}" name="city" type="text" placeholder="City">
+
+              <label for="state">State</label>
+                  <input value="{{ user[11] }}" class="form-control" name="states" type="text" placeholder="State" id="state">
+
+              <label>Zip Code</label>
+              <input class="form-control" value="{{ user[15] }}" name="Zip" type="text" placeholder="Zip Code">
+    
+              <label>Country</label>
+              <div style="margin: 8px">
+                  <select class="form-control" name="country" id="country">
+                      <option>select country</option>
+                  </select>
+
+              </div>
+              
+              <label>Phone</label>
+              <input class="form-control" value="{{ user[16] }}" name="Phone" type="text" placeholder="Phone">
+
+              <label>Email</label>
+              <input  class="form-control" value="{{ user[2] }}" readonly name="email" placeholder="Enter your email">
+
+              <br>
+              <input class="button button4" type="submit" value="submit">
+            </div>
+
+          </form>
+          </div>
+        </div>
+      </div>
+        <div style="margin-top: 8px" class="container">
+            <h2>My Logos</h2>
+            {%if userlogos|length != 0%}
+            <div class="row">
+              {% for i in range (userlogos|length) %}
+              <div class="col-lg-2 col-md-3 d-flex align-items-stretch mt-2 mt-md-0">
+                <div class="icon-box">
+                  <div><img height="100px" width="100px" src="{{userlogos[i][1]}}"></div><br>
+                    <a href="/deleteuserlogo?id={{userlogos[i][2]}}" class="button button4">Delete</a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif%}
+            {%if userlogos|length == 0%}
+            <p>No Logos Found</p>
+            {% endif%}
+            <form enctype="multipart/form-data"  method="post" action="/uploaduserlogo">
+              <label>Upload New Logo</label><br>
+              <input  type="file" name="file"><br><br>
+              <button type="submit" class="btn btn-primary mr-2">Upload</button>
+            </form>
+        </div>
+    </section><!-- End About Section -->
+
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>{{ appname }}</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/eterna-free-multipurpose-bootstrap-template/ -->
+        Designed by <a href="http://aerialestimation.com/">{{ author }}</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/purecounter/purecounter.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+
+  <!-- Template Main JS File -->
+{#  <script src="assets/js/main.js"></script>#}
+  <script src="{{ url_for('static',filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/country-states.js') }}"></script>
+
+
+
+<script>
+// user country code for selected option
+let user_country_code = "{{ user[10] }}";
+(function () {
+    // script https://www.html-code-generator.com/html/drop-down/country-region
+
+    // Get the country name and state name from the imported script.
+    let country_list = country_and_states['country'];
+    let states_list = country_and_states['states'];
+
+    // creating country name drop-down
+    let option =  '';
+    option += '<option>select country</option>';
+    for(let country_code in country_list){
+        // set selected option user country
+        let selected = (country_code == user_country_code) ? ' selected' : '';
+        option += '<option value="'+country_code+'"'+selected+'>'+country_list[country_code]+'</option>';
+    }
+    document.getElementById('country').innerHTML = option;
+
+    // creating states name drop-down
+    let text_box = '<input type="text" name="states" class="input-text" id="state">';
+    let state_code_id = document.getElementById("state-code");
+
+    function create_states_dropdown() {
+        // get selected country code
+        let country_code = document.getElementById("country").value;
+        let states = states_list[country_code];
+        // invalid country code or no states add textbox
+        if(!states){
+            state_code_id.innerHTML = text_box;
+            return;
+        }
+        let option = '';
+        if (states.length > 0) {
+            option = '<select name="states" id="state">\n';
+            for (let i = 0; i < states.length; i++) {
+                option += '<option name="states" value="'+states[i].code+'">'+states[i].name+'</option>';
+            }
+            option += '</select>';
+        } else {
+            // create input textbox if no states
+            option = text_box
+        }
+        state_code_id.innerHTML = option;
+    }
+
+    // country select change event
+    const country_select = document.getElementById("country");
+    country_select.addEventListener('change', create_states_dropdown);
+
+    create_states_dropdown();
+})();
+
+</script>
+
+
+</body>
+
+</html>

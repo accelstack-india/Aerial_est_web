@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+    <style>
+.button {
+  background-color: #04AA6D; /* Green */
+  border: none;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button1 {border-radius: 2px;}
+.button2 {border-radius: 4px;}
+.button3 {border-radius: 8px;}
+.button4 {border-radius: 12px;}
+.button5 {border-radius: 50%;}
+</style>
+
+
+    <style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+</style>
+
+ <style>
+
+
+        .badge {
+  padding-left: 9px;
+  padding-right: 9px;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+
+.label-warning[href],
+.badge-warning[href] {
+  background-color: #c67605;
+}
+#lblCartCount {
+    font-size: 12px;
+    background: #ff0000;
+    color: #fff;
+    padding: 0 5px;
+    vertical-align: top;
+    margin-left: -10px;
+}
+
+
+        .circular {
+          border-radius: 50%;
+        }
+
+        .float{
+	position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:#25d366;
+	color:#FFF;
+	border-radius:50px;
+	text-align:center;
+  font-size:30px;
+	box-shadow: 2px 2px 3px #999;
+  z-index:100;
+}
+
+.my-float{
+	margin-top:16px;
+}
+    </style>
+
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+
+  <title>{{ about_title }}</title>
+  <meta content="{{ aboutpagemeta }}" name="description">
+  <meta content="{{ aboutpagemetakeyword }}" name="keywords">
+    <meta name="robots" content="INDEX,FOLLOW">
+  <!-- Favicons -->
+{#  <link href="{{ url_for('static',filename='img/favicon.png') }}" rel="icon">#}
+{#  <link href="assets/img/favicon.png" rel="icon">#}
+  <link href="{{ url_for('static',filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+{#  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">#}
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static',filename='vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Top Bar ======= -->
+  <section id="topbar" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+      <div class="contact-info d-flex align-items-center">
+        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">{{ companymail }}</a></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{ companyphone }}</span></i>
+      </div>
+      <div class="social-links d-none d-md-flex align-items-center">
+        <a href="{{ companytwitter }}" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="{{ companyfacebook }}" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="{{ companyinstagram }}" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="{{ companylinkedin }}" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <div class="logo">
+{#        <h1><a href="/">Eterna</a></h1>#}
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <a href="/"><img  src="{{ applogo }}" alt="" class="img-fluid"></a>
+      </div>
+
+            <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/contact">Contact</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+          <li class="dropdown"><a href="#"><span>My Account</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+{#              <li><a href="#">Drop Down 1</a></li>#}
+                {% if userlogedin == True %}
+                    <div class="row">
+                    <div align="center">
+
+                    <h6>Welcome<br><b>{{ username }}</b></h6>
+                    </div>
+                    </div>
+                  <li><a href="/myorders">My Orders</a></li>
+                  <li><a href="/myaccount">My Account</a></li>
+                  <li><a href="/mywallet">My Wallet</a></li>
+                  <li><a href="/mygroups">My Groups</a></li>
+                  <li><a href="/userlogout">Logout</a></li>
+                {% endif %}
+             {% if userlogedin == False %}
+                  <li><a href="/userlogin">Login</a></li>
+                  <li><a href="/userregister">Register</a></li>
+                {% endif %}
+            </ul>
+          </li>
+          <li><a href="/ordernew">Order</a></li>
+          <li class="bi bi-cart d-flex align-items-center ms-4"><a href="/cart" class="active">Cart</a><span style="margin-left: 10px" class='badge badge-warning' id='lblCartCount'>{{ cartitems|length }}</span></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li>Cart</li>
+        </ol>
+        <h2>Cart ({{ paramlist|length }} Items)</h2>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+    <div>
+    </div>
+      <div class="container">
+
+          {% for i in range(cartitems|length) %}
+              <button class="collapsible">
+                  {{ cartitems[i][7] }}<br>
+                  Price : ${{ paramlist[i]['price'] }}<br>
+                  Address : {{ paramlist[i]['address'] }}<br>
+                  Date : {{ cartitems[i][4] }}
+              </button>
+            <div class="content">
+            {% for key, value in paramlist[i].items() %}
+                <b>{{ key|e }}</b> :
+                <a>{{ value|e }}</a><br>
+            {% endfor %}
+            <a href="/deletecart?id={{ cartitems[i][0] }}" class="button button4" >Delete</a>
+            </div>
+              <br>
+          {% endfor %}
+      {% if cartitems|length !=0%}
+            <button onclick="location.href='/checkout'" id="proceedbtn" class="button button4">Proceed to check Out</button>
+      {% endif %}
+            <button onclick="location.href='/ordernew'" id="proceedbtn" class="button button4">Continue Shopping</button>
+      </div>
+    </section><!-- End About Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+        <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+                {% for i in range(servicelist|length) %}
+              <li><i class="bx bx-chevron-right"></i> <a href="#">{{ servicelist[i][1] }}</a></li>
+                {% endfor %}
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h4>Contact Us</h4>
+            <p>
+              {{ address }}
+                <br><br>
+              <strong>Phone:</strong> {{ companyphone }}<br>
+              <strong>Email:</strong> {{ companymail }}<br>
+            </p>
+
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-info">
+            <h3>{{ appname }}</h3>
+            <p>{{ appname }}</p>
+            <div class="social-links mt-3">
+              <a href="{{ companytwitter }}" class="twitter"><i class="bx bxl-twitter"></i></a>
+              <a href="{{ companyfacebook }}" class="facebook"><i class="bx bxl-facebook"></i></a>
+              <a href="{{ companyinstagram }}" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="{{ companylinkedin }}" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>{{ appname }}</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/eterna-free-multipurpose-bootstrap-template/ -->
+        Designed by <a href="http://aerialestimation.com/">{{ author }}</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/purecounter/purecounter.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+
+  <!-- Template Main JS File -->
+{#  <script src="assets/js/main.js"></script>#}
+  <script src="{{ url_for('static',filename='js/main.js') }}"></script>
+
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  });
+}
+</script>
+
+<script>
+    price=0;
+    paramlist = {{ paramlist|safe }}
+    for(let i= 0;i<paramlist.length;i++){
+        price = price+paramlist[i]['price'];
+        document.getElementById('proceedbtn').innerHTML="Proceed to checkout : $"+price;
+        console.log(paramlist[i]['price'])
+    }
+</script>
+
+</body>
+
+</html>

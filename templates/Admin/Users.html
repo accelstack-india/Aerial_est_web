@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- Mirrored from www.Aerialestimation.com/melody/template/pages/forms/basic_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Sep 2018 06:07:32 GMT -->
+<head>
+  <script>
+    var resdeluserid = "";
+  </script>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin</title>
+  <!-- plugins:css -->
+   <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/iconfonts/font-awesome/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/css/vendor.bundle.base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/css/vendor.bundle.addons.css') }}">
+  <!-- endinject -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/css/style.css') }}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="http://www.Aerialestimation.com/" />
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:../../partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row default-layout-navbar">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a href="/admin"><img height="50px" src="{{ url_for('static',filename='img/logo.png') }}" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="/admin"><img src="{{ url_for('static',filename='img/logo.png') }}" alt="logo"/></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-stretch">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="fas fa-bars"></span>
+        </button>
+        <ul class="navbar-nav navbar-nav-right">
+
+          <li class="nav-item nav-profile dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                    <img src="{{ url_for('static',filename='Admin/images/faces/face5.jpg') }}" alt="profile">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a href="/admin/sitesettings" class="dropdown-item">
+                <i class="fas fa-cog text-primary"></i>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/admin/logout" class="dropdown-item">
+                <i class="fas fa-power-off text-primary"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="fas fa-bars"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_settings-panel.html -->
+      <div class="theme-setting-wrapper">
+
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close fa fa-times"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles primary"></div>
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      <!-- partial:../../partials/_sidebar.html -->
+       <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item nav-profile">
+            <div class="nav-link">
+              <div class="profile-image">
+                <img src="{{ url_for('static',filename='Admin/images/faces/face5.jpg') }}" alt="image"/>
+              </div>
+              <div class="profile-name">
+                <p class="name">
+                  Welcome {{ session.get('name') }}
+                </p>
+                  {% if session.get('role') == 1 %}
+                    <p class="designation">
+                     Super Admin
+                    </p>
+                  {% endif %}
+                  {% if session.get('role') == 2 %}
+                    <p class="designation">
+                     Team Leader
+                    </p>
+                  {% endif %}
+                  {% if session.get('role') == 3 %}
+                    <p class="designation">
+                     Employee
+                    </p>
+                  {% endif %}
+              {% if session.get('role') == 4 %}
+                    <p class="designation">
+                     SEO
+                    </p>
+                  {% endif %}
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">
+              <i class="fa fa-home menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+            {% if session.get('role') == 1 or session.get('role') == 4 %}
+                <li class="nav-item">
+            <a class="nav-link" href="/admin/sitesettings">
+              <i class="fa fa-cog menu-icon"></i>
+              <span class="menu-title">Site Settings</span>
+            </a>
+          </li>
+            {% endif %}
+{#          <li class="nav-item">#}
+{#            <a class="nav-link" href="pages/widgets.html">#}
+{#              <i class="fa fa-puzzle-piece menu-icon"></i>#}
+{#              <span class="menu-title">Widgets</span>#}
+{#            </a>#}
+{#          </li>#}
+            {% if session.get('role') == 1 or session.get('role') == 4 %}
+                <li class="nav-item">
+
+              {% if session.get('role') == 4 or session.get('role') == 1 %}
+                <a class="nav-link" data-toggle="collapse" href="#page-layouts" aria-expanded="false" aria-controls="page-layouts">
+              <i class="fab fa-trello menu-icon"></i>
+              <span class="menu-title">CMS</span>
+              <i class="menu-arrow"></i>
+            </a>
+                {% endif %}
+            <div class="collapse" id="page-layouts">
+           <ul class="nav flex-column sub-menu">
+               <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/edithomepage/">Home page</a></li>
+                <li class="nav-item"> <a class="nav-link" href="/admin/editfaqpage/">FAQ</a></li>
+<li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editblogpage/">Blog</a></li>
+ <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editpricingpage/">Pricing</a></li>
+{#                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editcontactpage/">Contact</a></li>#}
+              </ul>
+            </div>
+          </li>
+                {% if session.get('role') == 1 %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/editservicepage">
+              <i class="fa fa-server menu-icon"></i>
+              <span class="menu-title">Managage Services</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/users">
+              <i class="fa fa-users menu-icon"></i>
+              <span class="menu-title">Customers</span>
+            </a>
+          </li>
+                                        {% endif %}
+
+                {% endif %}
+
+        {% if session.get('role') == 1 %}
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/Employees">
+              <i class="fa fa-layer-group menu-icon"></i>
+              <span class="menu-title">Employees</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if session.get('role') == 1  or session.get('role') == 2%}
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/wallettransactions">
+              <i class="fa fa-wallet menu-icon"></i>
+              <span class="menu-title">Wallet Statistics</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if session.get('role')!=4 %}
+                <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#page-layouts2" aria-expanded="false" aria-controls="page-layouts">
+              <i class="fa fa-shopping-cart menu-icon"></i>
+              <span class="menu-title">Orders</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="page-layouts2">
+           <ul class="nav flex-column sub-menu">
+               {% if session.get('role') == 1 or session.get('role') == 2 or session.get('role') == 3 %}
+               <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/orders">All Orders</a></li>
+                <li class="nav-item"> <a class="nav-link" href="/admin/pendingorders">Pending Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/processingorders">Processing Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/completedorders">Completed Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/cancelledorders">Cancelled Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/verificationorders">Verification needed Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/unassignedorders">Un-Assigned Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/myassignedorders">My Assigned Orders</a></li>
+
+               {% endif %}
+
+              </ul>
+            </div>
+          </li>
+        {% endif %}
+
+            {% if session.get('role') == 1 %}
+
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/Usergroups">
+              <i class="fa fa-users menu-icon"></i>
+              <span class="menu-title">User Groups</span>
+            </a>
+          </li>
+
+            <li class="nav-item">
+            <a class="nav-link" href="/admin/autodiscount">
+              <i class="fa fa-gift menu-icon"></i>
+              <span class="menu-title">Auto Discount</span>
+            </a>
+          </li>
+
+            <li class="nav-item">
+            <a class="nav-link" href="/admin/coupon">
+              <i class="fa fa-ticket-alt menu-icon"></i>
+              <span class="menu-title">Coupon Code</span>
+            </a>
+          </li>
+
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/contactrequests">
+              <i class="fa fa-star menu-icon"></i>
+              <span class="menu-title">Contact Requests</span>
+            </a>
+          </li>
+        {% endif %}
+        </ul>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <button class="btn btn-primary mr-2" onclick="history.back()">Go Back</button>
+            <h3 class="page-title">
+                Manage
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Forms</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Home Elements</li>
+                </ol>
+            </nav>
+          </div>
+
+
+
+
+          <div class="row">
+            <div class="col-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">
+                    <i class="fas fa-user"></i>
+                    All Users
+                  </h4>
+                  <div class="table-responsive">
+                    <table class="table">
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Created At</th>
+                        <th>Personal Wallet</th>
+                        <th>Secondary Email</th>
+                        <th>Billing Address</th>
+                        <th>Discount Group</th>
+                        <th>Delete</th>
+                        <th>Transactions</th>
+                      <tbody>
+                      {% for i in range(users|length) %}
+                        <tr>
+                          <td class="font-weight-bold">
+                              {{ users[i][0]+" "+users[i][1] }}
+                          </td>
+{#                          <td>#}
+{#                            <label class="badge badge-light badge-pill">{{ orders[i][3][0]}}</label>#}
+{#                          </td>#}
+                          <td>
+                              {{ users[i][2]}}
+                          </td>
+                            <td>
+                                {{ users[i][4] }}
+                          </td>
+                            <td>
+                                {{ users[i][5] }}
+                          </td>
+                          <td>
+                                {{ users[i][7] }}
+                          </td>
+                          <td>
+                                {{ users[i][8] }}
+                          </td>
+                            <td>
+                                {{ users[i][9] }}
+                          </td>
+                            <td>
+                              <button onclick='validateDelinfo("{{users[i][2]}}","{{users[i][0]}}","{{users[i][1]}}")' data-toggle="modal" data-target="#exampleModal-delete"  class="btn btn-primary btn-icon-text">Delete<i class="btn-icon-append fas fa-trash"></i></button>
+                              <!-- <button onclick="location.href='/admin/deleteuser?id={{ users[i][2] }}'" class="btn btn-primary btn-icon-text">Delete<i class="btn-icon-append fas fa-trash"></i></button> -->
+                            </td>
+
+                            <div class="modal fade" id="exampleModal-delete" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel-delete" aria-hidden="true">
+                            <div class="modal-dialog modal-sm" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel-delete">Delete</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  <a id="delwarningmsg">Are you sure Delete <b>
+                                  </b> ?</a>
+                                  <br>
+                                  <br>
+                                  <br>
+                                  <button data-dismiss="modal" aria-label="Close"
+                                    class="btn btn-primary mr-2">Close</button>
+                                  <a id="deluserbtn" class="btn btn-primary mr-2">Yes
+                                    delete</a>
+                                    <!-- <a href="/admin/deleteuser?id={{ users[i][2] }}" class="btn btn-primary mr-2">Yes
+                                      delete</a> -->
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                           <td>
+                            <button onclick="location.href='/admin/transactions?id={{ users[i][2] }}'" class="btn btn-primary btn-icon-text">Transactions<i class="btn-icon-append fas fa-money-bill"></i></button>
+                            </td>
+                        <td>
+                            <button onclick="location.href='/admin/managecustomers?id={{ users[i][2] }}'" class="btn btn-primary btn-icon-text">Manage<i class="btn-icon-append fas fa-toolbox"></i></button>
+                            </td>
+                        </tr>
+                      {% endfor %}
+
+
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- content-wrapper ends -->
+        <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021 <a href="http://www.aerialestimation.com/" target="_blank">Aerial Estimation</a>. All rights reserved.</span>
+
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+ <script src="{{ url_for('static',filename='Admin/vendors/js/vendor.bundle.base.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/vendors/js/vendor.bundle.addons.js') }}"></script>
+{#  <script src="vendors/js/vendor.bundle.base.js"></script>#}
+{#  <script src="vendors/js/vendor.bundle.addons.js"></script>#}
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{{ url_for('static',filename='Admin/js/off-canvas.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/hoverable-collapse.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/misc.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/settings.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/todolist.js') }}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+    <script src="{{ url_for('static',filename='Admin/js/file-upload.js') }}"></script>
+    <script src="{{ url_for('static',filename='Admin/js/typeahead.js') }}"></script>
+    <script src="{{ url_for('static',filename='Admin/js/select2.js') }}"></script>
+<script>
+  function validateDelinfo(a,b,c){
+    console.log(a)
+    console.log(b)
+    console.log(c)
+    resdeluserid = a
+    document.getElementById('delwarningmsg').innerHTML = "Are You Sure You Want To Delete <b>"+ b+" "+c+"</b>"
+    document.getElementById("deluserbtn").setAttribute("href","/admin/deleteuser?id="+a);
+  }
+
+</script>
+
+{#  <script src="../../js/file-upload.js"></script>#}
+{#  <script src="../../js/typeahead.js"></script>#}
+{#  <script src="../../js/select2.js"></script>#}
+  <!-- End custom js for this page-->
+</body>
+
+
+<!-- Mirrored from www.Aerialestimation.com/melody/template/pages/forms/basic_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Sep 2018 06:07:34 GMT -->
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+<style>
+.float-child {
+    width: 50%;
+    float: left;
+}
+</style>
+
+    <style>
+.button {
+  background-color: #3fb1d3; /* Green */
+  border: none;
+  color: white;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button1 {border-radius: 2px;}
+.button2 {border-radius: 4px;}
+.button3 {border-radius: 8px;}
+.button4 {border-radius: 4px;}
+.button5 {border-radius: 50%;}
+
+.aParent div {
+    float: left;
+    clear: none;
+}
+</style>
+
+
+
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+
+  <title>{{ about_title }}</title>
+  <meta content="{{ aboutpagemeta }}" name="description">
+  <meta content="{{ aboutpagemetakeyword }}" name="keywords">
+    <meta name="robots" content="INDEX,FOLLOW">
+  <!-- Favicons -->
+{#  <link href="{{ url_for('static',filename='img/favicon.png') }}" rel="icon">#}
+{#  <link href="assets/img/favicon.png" rel="icon">#}
+  <link href="{{ url_for('static',filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+{#  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">#}
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static',filename='vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Top Bar ======= -->
+  <section id="topbar" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+      <div class="contact-info d-flex align-items-center">
+        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">{{ companymail }}</a></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{ companyphone }}</span></i>
+      </div>
+      <div class="social-links d-none d-md-flex align-items-center">
+        <a href="{{ companytwitter }}" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="{{ companyfacebook }}" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="{{ companyinstagram }}" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="{{ companylinkedin }}" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <div class="logo">
+{#        <h1><a href="/">Eterna</a></h1>#}
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <a href="/"><img  src="{{ applogo }}" alt="" class="img-fluid"></a>
+      </div>
+
+            <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/contact">Contact</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+          <li class="dropdown"><a href="#"><span>My Account</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+{#              <li><a href="#">Drop Down 1</a></li>#}
+                {% if userlogedin == True %}
+                    <div class="row">
+                    <div align="center">
+
+                    <h6>Welcome<br><b>{{ username }}</b></h6>
+                    </div>
+                    </div>
+                  <li><a href="/myorders">My Orders</a></li>
+                  <li><a href="/myaccount">My Account</a></li>
+                  <li><a href="/mywallet">My Wallet</a></li>
+                  <li><a href="/mygroups">My Groups</a></li>
+                  <li><a href="/userlogout">Logout</a></li>
+                {% endif %}
+             {% if userlogedin == False %}
+                  <li><a href="/userlogin">Login</a></li>
+                  <li><a href="/userregister">Register</a></li>
+                {% endif %}
+            </ul>
+          </li>
+          <li><a href="/ordernew">Order</a></li>
+          <li class="bi bi-cart d-flex align-items-center ms-4"><a href="/cart">Cart</a><span style="margin-left: 10px" class='badge badge-warning' id='lblCartCount'>0</span></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li>View Order</li>
+        </ol>
+        <h2>Order - {{ myorders[0][0] }}</h2>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+      <div class="container">
+          <div class="card">
+              <div class="card-body">
+                  <button onclick="goBack()" class="button button4" >Back</button>
+                  <h4>{{ myorders[0][0] }}</h4>
+                  <b>{{ servicename[0] }}</b><br>
+                  <div style="float: left; width: 50%">
+                      <dl>
+                        {% for key, value in paramlist[0].items() %}
+                            <b>{{ key|e }}</b> :
+                            <a>{{ value|e }}</a><br>
+                        {% endfor %}
+                        </dl>
+                  </div>
+                  <div style="float: right; width: 50%">
+                  <b>Cart Total : ${{ pricelist[0]['cart_total'] }}</b><br>
+                  <b>Auto Discount : ${{ pricelist[0]['autodiscountedprice'] }}</b><br>
+                  <b>Coupon Discount : ${{ pricelist[0]['couponcode_discountedprice'] }}</b><br>
+                  <b style="color: red">Amount Paid : ${{ pricelist[0]['paidamount'] }}</b><br>
+                      <button onclick="window.location.href='/deliverables?id={{ myorders[0][0] }}&sub_id={{ myorders[0][9] }}'" class="button button4" >Deliverables</button>
+                      <button onclick="window.location.href='/chat?id={{ myorders[0][0] }}&sub_id={{ myorders[0][9] }}'" class="button button4" >Chat</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </section><!-- End About Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>{{ appname }}</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/eterna-free-multipurpose-bootstrap-template/ -->
+        Designed by <a href="http://aerialestimation.com/">{{ author }}</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/purecounter/purecounter.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+
+  <!-- Template Main JS File -->
+{#  <script src="assets/js/main.js"></script>#}
+  <script src="{{ url_for('static',filename='js/main.js') }}"></script>
+
+<script>
+function goBack() {
+  window.history.back();
+}
+</script>
+</body>
+
+</html>

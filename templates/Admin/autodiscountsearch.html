@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- Mirrored from www.Aerialestimation.com/melody/template/pages/forms/basic_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Sep 2018 06:07:32 GMT -->
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Admin</title>
+  <!-- plugins:css -->
+   <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/iconfonts/font-awesome/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/css/vendor.bundle.base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/vendors/css/vendor.bundle.addons.css') }}">
+  <!-- endinject -->
+  <!-- inject:css -->
+  <link rel="stylesheet" href="{{ url_for('static',filename='Admin/css/style.css') }}">
+  <!-- endinject -->
+  <link rel="shortcut icon" href="http://www.Aerialestimation.com/" />
+</head>
+
+<body>
+  <div class="container-scroller">
+    <!-- partial:../../partials/_navbar.html -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row default-layout-navbar">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a href="/admin"><img height="50px" src="{{ url_for('static',filename='img/logo.png') }}" alt="logo"/></a>
+        <a class="navbar-brand brand-logo-mini" href="/admin"><img src="{{ url_for('static',filename='img/logo.png') }}" alt="logo"/></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-stretch">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+          <span class="fas fa-bars"></span>
+        </button>
+        <ul class="navbar-nav navbar-nav-right">
+
+          <li class="nav-item nav-profile dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                    <img src="{{ url_for('static',filename='Admin/images/faces/face5.jpg') }}" alt="profile">
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a href="/admin/sitesettings" class="dropdown-item">
+                <i class="fas fa-cog text-primary"></i>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/admin/logout" class="dropdown-item">
+                <i class="fas fa-power-off text-primary"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+          <span class="fas fa-bars"></span>
+        </button>
+      </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+      <!-- partial:../../partials/_settings-panel.html -->
+      <div class="theme-setting-wrapper">
+
+        <div id="theme-settings" class="settings-panel">
+          <i class="settings-close fa fa-times"></i>
+          <p class="settings-heading">SIDEBAR SKINS</p>
+          <div class="sidebar-bg-options selected" id="sidebar-light-theme"><div class="img-ss rounded-circle bg-light border mr-3"></div>Light</div>
+          <div class="sidebar-bg-options" id="sidebar-dark-theme"><div class="img-ss rounded-circle bg-dark border mr-3"></div>Dark</div>
+          <p class="settings-heading mt-2">HEADER SKINS</p>
+          <div class="color-tiles mx-0 px-4">
+            <div class="tiles primary"></div>
+            <div class="tiles success"></div>
+            <div class="tiles warning"></div>
+            <div class="tiles danger"></div>
+            <div class="tiles info"></div>
+            <div class="tiles dark"></div>
+            <div class="tiles default"></div>
+          </div>
+        </div>
+      </div>
+      <!-- partial:../../partials/_sidebar.html -->
+       <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item nav-profile">
+            <div class="nav-link">
+              <div class="profile-image">
+                <img src="{{ url_for('static',filename='Admin/images/faces/face5.jpg') }}" alt="image"/>
+              </div>
+              <div class="profile-name">
+                <p class="name">
+                  Welcome {{ session.get('name') }}
+                </p>
+                  {% if session.get('role') == 1 %}
+                    <p class="designation">
+                     Super Admin
+                    </p>
+                  {% endif %}
+                  {% if session.get('role') == 2 %}
+                    <p class="designation">
+                     Team Leader
+                    </p>
+                  {% endif %}
+                  {% if session.get('role') == 3 %}
+                    <p class="designation">
+                     Employee
+                    </p>
+                  {% endif %}
+              {% if session.get('role') == 4 %}
+                    <p class="designation">
+                     SEO
+                    </p>
+                  {% endif %}
+              </div>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">
+              <i class="fa fa-home menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+            {% if session.get('role') == 1 or session.get('role') == 4 %}
+                <li class="nav-item">
+            <a class="nav-link" href="/admin/sitesettings">
+              <i class="fa fa-cog menu-icon"></i>
+              <span class="menu-title">Site Settings</span>
+            </a>
+          </li>
+            {% endif %}
+{#          <li class="nav-item">#}
+{#            <a class="nav-link" href="pages/widgets.html">#}
+{#              <i class="fa fa-puzzle-piece menu-icon"></i>#}
+{#              <span class="menu-title">Widgets</span>#}
+{#            </a>#}
+{#          </li>#}
+            {% if session.get('role') == 1 or session.get('role') == 4 %}
+                <li class="nav-item">
+
+              {% if session.get('role') == 4 or session.get('role') == 1 %}
+                <a class="nav-link" data-toggle="collapse" href="#page-layouts" aria-expanded="false" aria-controls="page-layouts">
+              <i class="fab fa-trello menu-icon"></i>
+              <span class="menu-title">CMS</span>
+              <i class="menu-arrow"></i>
+            </a>
+                {% endif %}
+            <div class="collapse" id="page-layouts">
+           <ul class="nav flex-column sub-menu">
+               <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/edithomepage/">Home page</a></li>
+                <li class="nav-item"> <a class="nav-link" href="/admin/editaboutpage/">About</a></li>
+                <li class="nav-item"> <a class="nav-link" href="/admin/editfaqpage/">FAQ</a></li>
+<li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editblogpage/">Blog</a></li>
+ <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editpricingpage/">Pricing</a></li>
+{#                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/editcontactpage/">Contact</a></li>#}
+              </ul>
+            </div>
+          </li>
+                {% if session.get('role') == 1 %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/editservicepage">
+              <i class="fa fa-server menu-icon"></i>
+              <span class="menu-title">Managage Services</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/users">
+              <i class="fa fa-users menu-icon"></i>
+              <span class="menu-title">Customers</span>
+            </a>
+          </li>
+                                        {% endif %}
+
+                {% endif %}
+
+        {% if session.get('role') == 1 %}
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/Employees">
+              <i class="fa fa-layer-group menu-icon"></i>
+              <span class="menu-title">Employees</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if session.get('role') == 1  or session.get('role') == 2%}
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/wallettransactions">
+              <i class="fa fa-wallet menu-icon"></i>
+              <span class="menu-title">Wallet Statistics</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if session.get('role')!=4 %}
+                <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#page-layouts2" aria-expanded="false" aria-controls="page-layouts">
+              <i class="fa fa-shopping-cart menu-icon"></i>
+              <span class="menu-title">Orders</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="page-layouts2">
+           <ul class="nav flex-column sub-menu">
+               {% if session.get('role') == 1 or session.get('role') == 2 or session.get('role') == 3 %}
+               <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/orders">All Orders</a></li>
+                <li class="nav-item"> <a class="nav-link" href="/admin/pendingorders">Pending Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/processingorders">Processing Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/completedorders">Completed Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/cancelledorders">Cancelled Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/verificationorders">Verification needed Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/unassignedorders">Un-Assigned Orders</a></li>
+                <li class="nav-item d-none d-lg-block"> <a class="nav-link" href="/admin/myassignedorders">My Assigned Orders</a></li>
+
+               {% endif %}
+
+              </ul>
+            </div>
+          </li>
+        {% endif %}
+
+            {% if session.get('role') == 1 %}
+
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/Usergroups">
+              <i class="fa fa-users menu-icon"></i>
+              <span class="menu-title">User Groups</span>
+            </a>
+          </li>
+
+            <li class="nav-item">
+            <a class="nav-link" href="/admin/autodiscount">
+              <i class="fa fa-gift menu-icon"></i>
+              <span class="menu-title">Auto Discount</span>
+            </a>
+          </li>
+
+            <li class="nav-item">
+            <a class="nav-link" href="/admin/coupon">
+              <i class="fa fa-ticket-alt menu-icon"></i>
+              <span class="menu-title">Coupon Code</span>
+            </a>
+          </li>
+
+           <li class="nav-item">
+            <a class="nav-link" href="/admin/contactrequests">
+              <i class="fa fa-star menu-icon"></i>
+              <span class="menu-title">Contact Requests</span>
+            </a>
+          </li>
+        {% endif %}
+        </ul>
+      </nav>
+      <!-- partial -->
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <button class="btn btn-primary mr-2" onclick="history.back()">Go Back</button>
+            <h3 class="page-title">
+                Manage
+            </h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Forms</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Home Elements</li>
+                </ol>
+            </nav>
+          </div>
+
+
+
+
+          <div class="row">
+            <div class="col-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                <div style="margin: 10px">
+                    <form action="/admin/autodiscountsearch" method="get">
+                      <input type="text" placeholder="Search by username.." name="search">
+                      <button type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                </div>
+                  <h4 class="card-title">
+                    <i class="fas fa-envelope"></i>
+                    All Groups
+                  </h4>
+                <div class="d-flex justify-content-between">
+
+                <h4 class="card-title">
+                    <i ><span>Total Groups : {{ discountgroups|length }}</span></i>
+                  </h4>
+                    <div>
+                        <div class="text-center">
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal-3">Create Group <i class="fa fa-plus"></i></button>
+                  </div>
+                        <div class="modal fade" id="exampleModal-3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-3" aria-hidden="true">
+                    <div class="modal-dialog modal-sm" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel-3">Create Coupon</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" enctype="multipart/form-data" action="/admin/autodiscount" class="forms-sample" >
+                                <div class="form-group">
+                                  <label for="exampleInputEmail3">Group Name</label>
+                                  <input  name="groupname" type="text" class="form-control" id="exampleInputEmail3" placeholder="Coupon Name">
+                                </div>
+
+                                <div class="form-group">
+                                  <label for="exampleInputEmail3">Discount rate %</label>
+                                  <input name="discountrate" value="" type="text" class="form-control" id="exampleInputEmail3" placeholder="Discount Rate">
+                                </div>
+                                <label for="exampleFormControlSelect3">Enabled ?</label>
+                                <select name="enabled" class="form-control form-control-sm" id="exampleFormControlSelect3">
+                                  <option value="1" >Yes</option>
+                                  <option value="0">No</option>
+                                </select>
+                                    <div class="form-group">
+                                  <label for="exampleInputEmail3">Message</label>
+                                  <input name="message" value="" type="text" class="form-control" id="exampleInputEmail3" placeholder="Message">
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="submit" class="btn btn-success">Submit</button>
+                                  <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                      </div></div></div></div></div>
+
+                <div class="col-sm-auto" align="center">
+                    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search By Group Name" title="Type in a order-id">
+                    <input type="text" id="myInput2" onkeyup="myFunction2()" placeholder="Search By Discount Rate" title="Type in a name">
+                    <input type="text" id="myInput3" onkeyup="myFunction3()" placeholder="Search status" title="Type in a name">
+                    <input type="text" id="myInput6" onkeyup="myFunction6()" placeholder="Search Date (yyyy-mm-dd)" title="Type in a name">
+                </div>
+
+                  <div class="table-responsive">
+                    <table id="myTable" class="table">
+                        <th>Group Name</th>
+                        <th>Discount Rate</th>
+                        <th>Enabled ?</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Delete</th>
+                        <th>Manage</th>
+                      <tbody>
+                      {% for i in range(discountgroups|length) %}
+                        <tr>
+{#                           <td class="font-weight-bold">#}
+{#                              {{ discountgroups[i][0] }}#}
+{#                          </td>#}
+                          <td class="font-weight-bold">
+                              {{ discountgroups[i][4] }}
+                          </td>
+                           <td>
+                            <label class="badge badge-danger badge-pill">{{ discountgroups[i][5] }}%</label>
+                          </td>
+{#                            <td>#}
+{#                                {{ discountgroups[i][3] }}%#}
+{#                          </td>#}
+
+                          <td>
+                              <a href="/admin/changedgroupstatus?id={{ discountgroups[i][0] }}" class="btn btn-primary mr-2">
+                                  {% if discountgroups[i][6] == 1%}
+                                      Yes
+                                  {% endif %}
+                                  {% if discountgroups[i][6] == 0%}
+                                       NO
+                                  {% endif %}
+                              </a>
+
+                          </td>
+                          <td>
+                              <label class="badge badge-primary badge-pill">{{ discountgroups[i][1] }}</label>
+                          </td>
+
+                          <td class="font-weight-bold">
+                              {{ discountgroups[i][8] }}
+                          </td>
+                          <td>
+                              <a href="/admin/deletedgroup?id={{ discountgroups[i][0] }}" class="btn btn-primary mr-2">Delete</a>
+                          </td>
+                          <td>
+                              <a href="/admin/manageusersdgroup?id={{ discountgroups[i][0] }}&grpname={{ discountgroups[i][1] }}" class="btn btn-primary mr-2">Manage Users</a>
+                          </td>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- content-wrapper ends -->
+        <!-- partial:../../partials/_footer.html -->
+        <footer class="footer">
+          <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021 <a href="http://www.aerialestimation.com/" target="_blank">Aerial Estimation</a>. All rights reserved.</span>
+
+          </div>
+        </footer>
+        <!-- partial -->
+      </div>
+      <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+  <!-- plugins:js -->
+ <script src="{{ url_for('static',filename='Admin/vendors/js/vendor.bundle.base.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/vendors/js/vendor.bundle.addons.js') }}"></script>
+{#  <script src="vendors/js/vendor.bundle.base.js"></script>#}
+{#  <script src="vendors/js/vendor.bundle.addons.js"></script>#}
+  <!-- endinject -->
+  <!-- Plugin js for this page-->
+  <!-- End plugin js for this page-->
+  <!-- inject:js -->
+  <script src="{{ url_for('static',filename='Admin/js/off-canvas.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/hoverable-collapse.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/misc.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/settings.js') }}"></script>
+  <script src="{{ url_for('static',filename='Admin/js/todolist.js') }}"></script>
+  <!-- endinject -->
+  <!-- Custom js for this page-->
+    <script src="{{ url_for('static',filename='Admin/js/file-upload.js') }}"></script>
+    <script src="{{ url_for('static',filename='Admin/js/typeahead.js') }}"></script>
+    <script src="{{ url_for('static',filename='Admin/js/select2.js') }}"></script>
+<script>
+function myFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+  <script>
+function myFunction2() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput2");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+    <script>
+function myFunction3() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput3");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+
+        <script>
+function myFunction5() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput5");
+  filter = input.value.toUpperCase();
+  filter = "  "+filter;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[6];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+      <script>
+function myFunction4() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput4");
+  filter = input.value.toUpperCase();
+  filter = "  "+filter;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[4];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+        <script>
+    function myFunction6() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput6");
+  filter = input.value.toUpperCase();
+  filter = "  "+filter;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[4];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+          <script>
+function myFunction7() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput7");
+  filter = input.value.toUpperCase();
+  filter = "  "+filter;
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[2];
+    td = tr[i].getElementsByTagName("td")[2];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+{#  <script src="../../js/file-upload.js"></script>#}
+{#  <script src="../../js/typeahead.js"></script>#}
+{#  <script src="../../js/select2.js"></script>#}
+  <!-- End custom js for this page-->
+</body>
+
+
+<!-- Mirrored from www.Aerialestimation.com/melody/template/pages/forms/basic_elements.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 15 Sep 2018 06:07:34 GMT -->
+</html>

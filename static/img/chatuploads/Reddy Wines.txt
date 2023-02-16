@@ -1,0 +1,13 @@
+1. Quantity and Product name order change in sales
+2. Show single bottle price in purchases
+3. Show recent entries on top in sales and purchases
+4. show date wise records in sales
+5. shop name in excel sheet
+6. Sale delete logic,
+7. scrolling bar
+8. Make highlight color little bright
+
+9 sale submit ans purchase submit
+10. only admin can delete or edit the purchase and selling price
+11. Manager can see the purchase price but cannot edit it and sales person cannot see the price it self, apart from admin no one can edit or delete the sale price
+12. admin can entry sales and purchases.   

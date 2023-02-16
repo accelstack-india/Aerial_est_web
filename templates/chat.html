@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+
+     <style>
+
+
+::-webkit-scrollbar {
+	width: 4px;
+}
+::-webkit-scrollbar-thumb {
+	background-color: #4c4c6a;
+	border-radius: 2px;
+}
+.chatbox {
+    width: 100%;
+    height: 70%;
+    background-color: #2f323b;
+    max-height: 500px;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+}
+.chat-window {
+    height: 500px;
+    display: flex;
+    flex-direction: column-reverse;
+    background: #2f323b;
+    overflow: auto;
+}
+.chat-input {
+    flex: 0 0 auto;
+    height: 250px;
+    background: #40434e;
+    border-top: 1px solid #2671ff;
+    box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+}
+
+.msg-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 10px 0;
+    padding: 0;
+}
+.msg-box {
+    display: flex;
+    background: #ffffff;
+    padding: 10px 10px 0 10px;
+    border-radius: 0 6px 6px 0;
+    max-width: 80%;
+    width: auto;
+    float: left;
+    box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+}
+.user-img {
+    display: inline-block;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    background: #2671ff;
+    margin: 0 10px 10px 0;
+}
+.flr {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 50px);
+}
+.messages {
+    flex: 1 0 auto;
+}
+.msg {
+    display: inline-block;
+    font-size: 11pt;
+    line-height: 13pt;
+    color: #0b0915;
+    margin: 0 0 4px 0;
+}
+.msg:first-of-type {
+    margin-top: 8px;
+}
+.timestamp {
+    color: #000000;
+    font-size: 12pt;
+    margin-bottom: 10px;
+}
+.username {
+    margin-right: 3px;
+}
+.posttime {
+    margin-left: 3px;
+}
+.msg-self .msg-box {
+    border-radius: 6px 0 0 6px;
+    background: #ffffff;
+    float: right;
+}
+.msg-self .user-img {
+    margin: 0 0 10px 10px;
+}
+.msg-self .msg {
+    text-align: right;
+}
+.msg-self .timestamp {
+    text-align: right;
+}
+    </style>
+
+
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+
+  <title>{{ about_title }}</title>
+  <meta content="{{ aboutpagemeta }}" name="description">
+  <meta content="{{ aboutpagemetakeyword }}" name="keywords">
+    <meta name="robots" content="INDEX,FOLLOW">
+  <!-- Favicons -->
+{#  <link href="{{ url_for('static',filename='img/favicon.png') }}" rel="icon">#}
+{#  <link href="assets/img/favicon.png" rel="icon">#}
+  <link href="{{ url_for('static',filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+{#  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">#}
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static',filename='vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{{ url_for('static',filename='styles/style.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Top Bar ======= -->
+  <section id="topbar" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+      <div class="contact-info d-flex align-items-center">
+        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">{{ companymail }}</a></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{ companyphone }}</span></i>
+      </div>
+      <div class="social-links d-none d-md-flex align-items-center">
+        <a href="{{ companytwitter }}" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="{{ companyfacebook }}" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="{{ companyinstagram }}" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="{{ companylinkedin }}" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="d-flex align-items-center">
+    <div class="container d-flex justify-content-between align-items-center">
+
+      <div class="logo">
+{#        <h1><a href="/">Eterna</a></h1>#}
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <a href="/"><img  src="{{ applogo }}" alt="" class="img-fluid"></a>
+      </div>
+
+            <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li class="dropdown"><a href="#"><span>My Account</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+{#              <li><a href="#">Drop Down 1</a></li>#}
+                {% if userlogedin == True %}
+                    <div class="row">
+                    <div align="center">
+
+                    <h6>Welcome<br><b>{{ username }}</b></h6>
+                    </div>
+                    </div>
+                  <li><a href="/myorders">My Orders</a></li>
+                  <li><a href="/myaccount">My Account</a></li>
+                  <li><a href="/mywallet">My Wallet</a></li>
+                  <li><a href="/mygroups">My Groups</a></li>
+                  <li><a href="/userlogout">Logout</a></li>
+                {% endif %}
+             {% if userlogedin == False %}
+                  <li><a href="/userlogin">Login</a></li>
+                  <li><a href="/userregister">Register</a></li>
+                {% endif %}
+            </ul>
+          </li>
+          <li><a href="/ordernew">Order</a></li>
+          <li class="bi bi-cart d-flex align-items-center ms-4"><a href="/cart">Cart</a><span style="margin-left: 10px" class='badge badge-warning' id='lblCartCount'>0</span></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <section id="breadcrumbs" class="breadcrumbs">
+      <div class="container">
+
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li>Chat</li>
+        </ol>
+        <h2>{{ request.args.get('id') }}</h2>
+
+      </div>
+    </section><!-- End Breadcrumbs -->
+
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+      <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+              {% if chats|length !=0 %}
+              <section class="chatbox">
+                    <section class="chat-window">
+                        {% for i in range(chats|length) %}
+                            {% if chats[i][8]==1 %}
+                                    <article class="msg-container msg-remote" id="msg-0">
+                                    <div class="msg-box">
+                                        <div class="flr">
+                                            <div class="messages">
+                                                <b class="msg" id="msg-0">
+                                                    {{ chats[i][3]}}
+                                                </b>
+                                                <p>
+                                                    {{ chats[i][4] }}
+                                                </p>
+                                                {% if chats[i][5]!="" %}
+                                                    <a href="{{ chats[i][5] }}" target="_blank">{{ chats[i][5] }}</a>
+                                                {% endif %}
+                                            </div>
+                                            <span class="timestamp"><span class="username">{{ chats[i][1] }}</span>&bull;<span class="posttime">{{ chats[i][6]}}</span></span>
+                                        </div>
+                                    </div>
+                                    </article>
+                            {% endif %}
+                            {% if chats[i][8]==0 %}
+                                <article class="msg-container msg-self" id="msg-0">
+                                    <div class="msg-box">
+                                        <div class="flr">
+                                            <div class="messages">
+                                                <b class="msg" id="msg-1">
+                                                    {{ chats[i][3]}}
+                                                </b>
+                                                <p>{{ chats[i][4] }}</p>
+                                                          {% if chats[i][5]!="" %}
+                                                    <a href="{{ chats[i][5] }}" target="_blank">{{ chats[i][5] }}</a>
+                                                {% endif %}
+                                            </div>
+                                            <span class="timestamp"><span class="username">{{ chats[i][2] }}</span>&bull;<span class="posttime">{{ chats[i][6]}}</span></span>
+                                        </div>
+                                    </div>
+                                </article>
+                            {% endif %}
+                        {% endfor %}
+                    </section>
+                </section><br>
+              {% endif %}
+            {% if chats|length ==0 %}
+            <p align="center">No chats found</p>
+            {% endif %}
+                <div>
+                    <form  class="forms-sample" enctype="multipart/form-data" method="post" action="/chat" >
+                        <label for="exampleInputName1">Subject</label>
+                      <input name="subject" value="" type="text" class="form-control" id="exampleInputName1" placeholder="Subject Here">
+                    <label for="exampleInputName1">Message</label>
+                        <textarea rows="4" name="message"  value="" type="text" class="form-control" id="exampleInputName1" placeholder="Subject Here"></textarea>
+                        <div class="form-group">
+                      <label>File upload</label>
+                      <div class="input-group col-xs-12">
+                        <span class="input-group-append">
+                          <input name="file" type="file">
+                        </span>
+                      </div>
+                            <div style="margin: 10px">
+                            <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                            </div>
+                    </div>
+                    </form>
+                </div>
+
+
+            </div>
+          </div>
+
+      </div>
+    </section><!-- End About Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+        <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+                {% for i in range(servicelist|length) %}
+              <li><i class="bx bx-chevron-right"></i> <a href="#">{{ servicelist[i][1] }}</a></li>
+                {% endfor %}
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h4>Contact Us</h4>
+            <p>
+              {{ address }}
+                <br><br>
+              <strong>Phone:</strong> {{ companyphone }}<br>
+              <strong>Email:</strong> {{ companymail }}<br>
+            </p>
+
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-info">
+            <h3>{{ appname }}</h3>
+            <p>{{ appname }}</p>
+            <div class="social-links mt-3">
+              <a href="{{ companytwitter }}" class="twitter"><i class="bx bxl-twitter"></i></a>
+              <a href="{{ companyfacebook }}" class="facebook"><i class="bx bxl-facebook"></i></a>
+              <a href="{{ companyinstagram }}" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="{{ companylinkedin }}" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>{{ appname }}</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/eterna-free-multipurpose-bootstrap-template/ -->
+        Designed by <a href="http://aerialestimation.com/">{{ author }}</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/php-email-form/validate.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/purecounter/purecounter.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ url_for('static',filename='vendor/waypoints/noframework.waypoints.js') }}"></script>
+
+  <!-- Template Main JS File -->
+{#  <script src="assets/js/main.js"></script>#}
+  <script src="{{ url_for('static',filename='js/main.js') }}"></script>
+
+
+</body>
+
+</html>

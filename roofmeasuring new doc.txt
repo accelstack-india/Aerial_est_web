@@ -1,0 +1,19 @@
+1. On Web decrese screen size. : trying 
+
+2. Description all products on home page under services. Completed. Need to remove from db.
+
+3. Remove Instant Squares Option from Services. completed.removed from DB.
+
+4. Increse logo size on website : http://roofmeasuring.com/static/img/logo.png , logo link. unable to load the image from here. Need to keep a local copy. done.
+
+5.Instead of Squares report need to add Pavement report description on about us page.  : completed. Updated in DataBase Table.
+
+6. Need to add reports info on pricing page : need to get content from harish.-- got details -- Checked and informed harish -- action pending from harish
+
+7. Need to change google map to Bing map on order page.  - trying 
+
+8. Start order id from  10000, 2212001 completed.
+
+9. give more space to comment box,bcoz more text need to be displayed in the comment section.: 
+
+10. Push Notifications. : Email.
