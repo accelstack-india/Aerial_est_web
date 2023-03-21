@@ -1145,11 +1145,11 @@ def checkout():
         for i in range(len(items)):
             a = json.loads(items[i][3])
             a['payment_mode'] = type
-            if autodiscount_applied == True:
+            if autodiscount_applied:
                 discounted_amount = json.loads(items[i][3])['price'] - (
                         (autodiscount_percentage / 100) * json.loads(items[i][3])['price'])
                 a['autodiscountedprice'] = discounted_amount
-            if couponcode_isapplied == True:
+            if couponcode_isapplied:
                 try:
                     a['couponcode_discountedprice'] = a['autodiscountedprice'] - (
                             (couponcode_percentage / 100) * a['autodiscountedprice'])
@@ -3051,13 +3051,13 @@ def admin_add_employee_controller():
             email = request.values.get('email')
             password = request.values.get('password')
             role = request.values.get('role')
-            if (role == "Admin"):
+            if role == "Admin":
                 role = 1
-            elif (role == "Team Lead"):
+            elif role == "Team Lead":
                 role = 2
-            elif (role == "Employee"):
+            elif role == "Employee":
                 role = 3
-            elif (role == "SEO"):
+            elif role == "SEO":
                 role = 4
             conn = pymysql.Connect(
                 host="localhost",
