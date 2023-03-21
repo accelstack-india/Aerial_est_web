@@ -989,11 +989,16 @@ def checkout():
 
 
 def generatingOrder():
+    conn = connectMysql()
+    cur = conn.cursor()
     idList = []
     date = datetime.datetime.today().strftime("%y") + datetime.datetime.today().strftime("%m")
-    cmd = "SELECT order_id FROM order_table WHERE order_id LIKE '{}'".format(date + '%')
     cmd = "SELECT order_id FROM order_table where order_id LIKE '2312%';"
-    data = dbConnector(cmd, 'fetchall')
+    cmd = "SELECT order_id FROM order_table WHERE order_id LIKE '{}'".format(date + '%')
+    cur.execute(cmd)
+    data = cur.fetchall()
+    cur.close()
+
     if data:
         for da in data:
             if da[0].startswith(date):
