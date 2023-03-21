@@ -1,6 +1,5 @@
 import json
 import os
-# import smtplib
 from random import randrange
 from time import sleep
 import pymysql
@@ -17,9 +16,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RECAPTCHA_SITE_KEY'] = '6LeuTW0eAAAAAHoCsv-IHdtjvMY4W4wnj7rl6qD9'  # <-- Add your site key
 app.config['RECAPTCHA_SECRET_KEY'] = '6LeuTW0eAAAAADo0-OCkk4UfKnZnf0uQs1SxXcFA'  # <-- Add your secret key
 recaptcha = ReCaptcha(app)  # Create a ReCaptcha object by passing in 'app' as parameter
-DBUserName = "root"
-DBName = "measure"
-password = ""
 
 paypalrestsdk.configure({
     "mode": "live",  # sandbox or live
@@ -27,19 +23,10 @@ paypalrestsdk.configure({
     "client_secret": "EJYyLKxLlVzX5_cbQ8RYNPVQ3xyZ7j4UrsMFN5OKH0XmRbCxdZN7k0TJgXSf--LcjBCdL5YrSkawBDqp"})
 
 
-def dbConnector(cmd, fetchtype):
-    # fetchtype is fetchall or fetchone
-    DBUserName = "root"
-    DBName = "measure"
-    password = ""
-
-    conn = pymysql.Connect(host="localhost", port=3306, user=DBUserName, password="", db=DBName, autocommit=True)
-    cur = conn.cursor()
-
-    cur.execute(cmd)
-
-    if fetchtype == 'fetchall':
-        return cur.fetchall()
+def connectMysql():
+    connection = pymysql.connect(host='localhost', port=3306, user='root', password='', db="measure",
+                                 autocommit=True, max_allowed_packet=67108864)
+    return connection
 
 
 @app.route('/')
@@ -47,93 +34,58 @@ def dbConnector(cmd, fetchtype):
 def index():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
-    sliderlist = []
-    servicelist = []
-    testimonialslist = []
-    clientslist = []
+        userLoggedIn = False
+    sliderList = []
+    serviceList = []
+    testimonialsList = []
+    clientsList = []
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table intro_sliders
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM introsliders')
-    sliderdata = cur.fetchall()
-    for row in sliderdata:
+    sliderData = cur.fetchall()
+    for row in sliderData:
         if row[5] == 1:
-            sliderlist.append(row)
+            sliderList.append(row)
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services WHERE isactive=1')
     services = cur.fetchall()
     for row in services:
-        servicelist.append(row)
+        serviceList.append(row)
     cur.close()
     # table testimonials
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM testimonials')
     testimonials = cur.fetchall()
     for row in testimonials:
-        testimonialslist.append(row)
+        testimonialsList.append(row)
     cur.close()
     # table clients
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM clients')
     clients = cur.fetchall()
     for row in clients:
-        clientslist.append(row)
+        clientsList.append(row)
     cur.close()
     try:
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
     return render_template('index.html',
                            appname=appdata[1],
@@ -156,11 +108,11 @@ def index():
                            appwhatsappnumber=appdata[20],
                            whatsappdefaulttext=appdata[21],
                            author=appdata[5],
-                           sliderlist=sliderlist,
-                           servicelist=servicelist,
-                           testimonialslist=testimonialslist,
-                           clientslist=clientslist,
-                           userlogedin=userlogedin,
+                           sliderlist=sliderList,
+                           servicelist=serviceList,
+                           testimonialslist=testimonialsList,
+                           clientslist=clientsList,
+                           userlogedin=userLoggedIn,
                            username=username,
                            cartitems=cartitems
                            )
@@ -170,19 +122,12 @@ def index():
 def faq():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
@@ -191,7 +136,6 @@ def faq():
     cur = conn.cursor()
     cur.execute('SELECT * FROM faqs')
     faqs = cur.fetchall()
-
     return render_template('faq.html',
                            appname=appdata[1],
                            applogo=appdata[4],
@@ -203,7 +147,7 @@ def faq():
                            companylinkedin=appdata[11],
                            address=appdata[18],
                            author=appdata[5],
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            faqs=faqs
                            )
@@ -213,46 +157,25 @@ def faq():
 def about():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     servicelist = []
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table about
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM about')
     aboutdata = cur.fetchone()
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services')
     services = cur.fetchall()
@@ -263,7 +186,7 @@ def about():
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
 
     cur = conn.cursor()
@@ -296,7 +219,7 @@ def about():
                            runner4desc=aboutdata[13],
                            aboutimage=aboutdata[14],
                            servicelist=servicelist,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            cartitems=cartitems,
                            aboutservice=aboutservice
@@ -308,32 +231,18 @@ def pricing():
     servicelist = []
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services')
     services = cur.fetchall()
@@ -353,14 +262,7 @@ def pricing():
         servicelist.append(a)
     # table pricing_page
     print(servicelist)
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM pricingpage')
     pricingpagedata = cur.fetchone()
@@ -370,7 +272,7 @@ def pricing():
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
 
     return render_template('pricing.html',
@@ -388,7 +290,7 @@ def pricing():
                            address=appdata[18],
                            author=appdata[5],
                            servicelist=servicelist,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            cartitems=cartitems,
                            )
@@ -398,34 +300,20 @@ def pricing():
 def blog():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     servicelist = []
     blogslist = []
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services')
     services = cur.fetchall()
@@ -433,27 +321,13 @@ def blog():
         servicelist.append(row)
     cur.close()
     # table blog page
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM blogpageinfo')
     blogpageinfo = cur.fetchone()
     cur.close()
     # table blog
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM blog ORDER BY created_at DESC')
     blogs = cur.fetchall()
@@ -464,7 +338,7 @@ def blog():
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
     return render_template('blog.html',
                            blogpage_title=blogpageinfo[1],
@@ -482,7 +356,7 @@ def blog():
                            author=appdata[5],
                            servicelist=servicelist,
                            blogslist=blogslist,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            cartitems=cartitems
                            )
@@ -492,39 +366,25 @@ def blog():
 def blogread():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     servicelist = []
     blogslist = []
     blogdata = []
     res = []
     blogid = request.args.get("id")
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table blog single
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM blog WHERE id = %s', (blogid))
+    cur.execute('SELECT * FROM blog WHERE id = %s', blogid)
     blogdetail = cur.fetchall()
     for row in blogdetail:
         blogdata = row
@@ -532,14 +392,7 @@ def blogread():
             res = row[4]
     cur.close()
     # table blog
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM blog ORDER BY created_at DESC')
     blogs = cur.fetchall()
@@ -547,14 +400,7 @@ def blogread():
         blogslist.append(row)
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services')
     services = cur.fetchall()
@@ -575,7 +421,7 @@ def blogread():
                            blogdata=blogdata,
                            blogslist=blogslist,
                            servicelist=servicelist,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            res=res
                            )
@@ -585,34 +431,20 @@ def blogread():
 def contact():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
 
     servicelist = []
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
     cur.close()
     # table services
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services')
     services = cur.fetchall()
@@ -623,7 +455,7 @@ def contact():
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
     return render_template('contact.html',
                            appname=appdata[1],
@@ -640,7 +472,7 @@ def contact():
                            iframe=appdata[19],
                            author=appdata[5],
                            servicelist=servicelist,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            cartitems=cartitems
                            )
@@ -654,14 +486,7 @@ def contactrequest():
         subject = request.values.get('subject')
         message = request.values.get('message')
         # insert into contactrequests
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute("INSERT INTO contactrequests(name,email,subject,message) VALUES (%s,%s,%s,%s)",
                     (name, email, subject, message))
@@ -675,14 +500,7 @@ def userlogin():
         if recaptcha.verify():
             email = request.values.get('email')
             password = request.values.get('password')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM users WHERE email = %s AND password = %s', (email, password))
             account = cur.fetchone()
@@ -715,27 +533,13 @@ def userregister():
         # insert into table user
         if recaptcha.verify():  # Use verify() method to see if ReCaptcha is filled out
             try:
-                conn = pymysql.Connect(
-                    host="localhost",
-                    port=3306,
-                    user=DBUserName,
-                    password="",
-                    db=DBName,
-                    autocommit=True
-                )
+                conn = connectMysql()
                 cur = conn.cursor()
                 cur.execute('INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)',
                             (firstname, lastname, email, password))
                 cur.close()
                 # Login Function
-                conn = pymysql.Connect(
-                    host="localhost",
-                    port=3306,
-                    user=DBUserName,
-                    password="",
-                    db=DBName,
-                    autocommit=True
-                )
+                conn = connectMysql()
                 cur = conn.cursor()
                 cur.execute('SELECT * FROM users WHERE email = %s AND password = %s', (email, password))
                 account = cur.fetchone()
@@ -764,20 +568,12 @@ def userregister():
 def ordernewpage():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
-    servicelist = []
+        userLoggedIn = False
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
@@ -787,18 +583,11 @@ def ordernewpage():
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
         cartitems = cur.fetchall()
-    except:
+    except pymysql.Error:
         cartitems = []
 
     servicelist = []
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM services WHERE isactive=1')
     services = cur.fetchall()
@@ -817,7 +606,7 @@ def ordernewpage():
                            address=appdata[18],
                            author=appdata[5],
                            username=username,
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            cartitems=cartitems
                            )
 
@@ -826,23 +615,16 @@ def ordernewpage():
 def orderpage():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     servicelist = []
     if session.get('_is_user_logged_in') is True:
         # table app_config
         if request.method == 'GET':
 
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM app_config')
             appdata = cur.fetchone()
@@ -866,7 +648,7 @@ def orderpage():
                     "service_price": detail[6],
                     "service_params": "",
                 }
-                if serviceid != None:
+                if serviceid is not None:
                     paramlist = []
                     cur = conn.cursor()
                     cur.execute('SELECT * FROM serviceparams WHERE id=%s', serviceid)
@@ -891,14 +673,14 @@ def orderpage():
                         cur = conn.cursor()
                         cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
                         cartitems = cur.fetchall()
-                    except:
+                    except pymysql.Error:
                         cartitems = []
 
                     try:
                         cur = conn.cursor()
                         cur.execute('SELECT * FROM userlogos WHERE user_id =%s', session.get('email'))
                         userlogos = cur.fetchall()
-                    except:
+                    except pymysql.Error:
                         userlogos = []
                     return render_template('order.html',
                                            appname=appdata[1],
@@ -914,7 +696,7 @@ def orderpage():
                                            servicelist=servicelist,
                                            address=appdata[18],
                                            author=appdata[5],
-                                           userlogedin=userlogedin,
+                                           userlogedin=userLoggedIn,
                                            username=username,
                                            servicename=servicename,
                                            serviceid=serviceid,
@@ -940,22 +722,14 @@ def orderpage():
             ser_id = request.args.get('ser_id')
             useremail = session.get('email')
             cart_id = "AER_EST-" + str(randrange(111111, 999999))
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             for key in postdata.keys():
                 cur = conn.cursor()
                 cur.execute('SELECT price from serviceparams WHERE param_heading = %s and id=%s', (key, ser_id))
                 price = cur.fetchone()
-                if price != None:
+                if price is not None:
                     sub_price = sub_price + price[0]
             a = json.dumps(postdata)
-            jsons = {}
             jsons = json.loads(a)
             jsons['Optional Deliverables'] = postdata.getlist('Optional Deliverables')
             a = json.dumps(jsons)
@@ -967,7 +741,7 @@ def orderpage():
                 totalprice = (service_price[0] + sub_price) * int(qty)
                 a = json.loads(a)
                 a['price'] = totalprice
-            except:
+            except pymysql.Error:
                 cur = conn.cursor()
                 cur.execute('SELECT price from services WHERE id = %s', ser_id)
                 service_price = cur.fetchone()
@@ -985,45 +759,23 @@ def orderpage():
 
 @app.route('/cart', methods=['GET', 'POST'])
 def cart():
-    username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
         servicelist = []
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
         cur.close()
         # table about
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM about')
         aboutdata = cur.fetchone()
         cur.close()
         # table services
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM services')
         services = cur.fetchall()
@@ -1057,43 +809,28 @@ def cart():
                                aboutpagemeta=aboutdata[2],
                                aboutpagemetakeyword=aboutdata[3],
                                servicelist=servicelist,
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                cartitems=cartitems,
                                paramlist=paramlist
                                )
     else:
-        userlogedin = False
         return redirect(url_for('userlogin'))
 
 
 @app.route('/deletecart', methods=['GET', 'POST'])
 def cont_deletecart():
     id = request.args.get('id')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('DELETE FROM cart_table WHERE id=%s', id)
     cur.close()
     return redirect(url_for('cart'))
 
 
-def orderinsert(a, order_id, service_id, i):
+def orderinsert(params, order_id, service_id, i):
     username = session.get('email')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     try:
         cur = conn.cursor()
         cur.execute('SELECT service_title FROM services WHERE id =%s', service_id)
@@ -1103,7 +840,7 @@ def orderinsert(a, order_id, service_id, i):
         a = {
             "service_id": service_id,
             "service_name": service_name,
-            "service_param": a
+            "service_param": params
         }
         cur = conn.cursor()
         try:
@@ -1130,14 +867,7 @@ def checkout():
         autodiscount_percentage = data.get('autodiscount_percentage')
         couponcode_percentage = data.get('couponcode_percentage')
         username = session.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM cart_table WHERE user_id=%s', username)
         items = cur.fetchall()
@@ -1154,7 +884,7 @@ def checkout():
                     a['couponcode_discountedprice'] = a['autodiscountedprice'] - (
                             (couponcode_percentage / 100) * a['autodiscountedprice'])
                     orderinsert(a, order_id, items[i][2], i)
-                except:
+                except pymysql.Error:
                     a['couponcode_discountedprice'] = a['price'] - (
                             (couponcode_percentage / 100) * json.loads(items[i][3])['price'])
                     orderinsert(a, order_id, items[i][2], i)
@@ -1166,19 +896,12 @@ def checkout():
         totalp = 0
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
+            userLoggedIn = False
         # table app_config
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1198,7 +921,7 @@ def checkout():
             totalp = totalp + json.loads(ro[3])['price']
             try:
                 qty = json.loads(ro[3])['quantity']
-            except:
+            except pymysql.Error:
                 qty = 1
             itemlist.append(
                 {
@@ -1252,7 +975,7 @@ def checkout():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                itemlist=itemlist,
                                totalp=totalp,
@@ -1331,14 +1054,7 @@ def execute():
 @app.route('/success', methods=['GET', 'POST'])
 def success():
     id = request.args.get('id')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM order_table WHERE order_id = %s', id)
     orders = cur.fetchall()
@@ -1349,19 +1065,12 @@ def success():
 def my_orders():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
@@ -1387,7 +1096,7 @@ def my_orders():
             a['autodiscountedprice'] = round(json.loads(myorders[i][3])['service_param']['price'] - autodiscountedprice,
                                              4)
             a['paidamount'] = json.loads(myorders[i][3])['service_param']['autodiscountedprice']
-        except:
+        except pymysql.Error:
             a['autodiscountedprice'] = 0
 
         try:
@@ -1395,7 +1104,7 @@ def my_orders():
             a['paidamount'] = json.loads(myorders[i][3])['service_param']['couponcode_discountedprice']
             a['couponcode_discountedprice'] = round(
                 json.loads(myorders[i][3])['service_param']['price'] - couponcode_discountedprice, 4)
-        except:
+        except pymysql.Error:
             a['couponcode_discountedprice'] = 0
 
         pricelist.append(a)
@@ -1413,7 +1122,7 @@ def my_orders():
                            companylinkedin=appdata[11],
                            address=appdata[18],
                            author=appdata[5],
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            myorders=myorders,
                            paramlist=paramlist,
@@ -1429,18 +1138,11 @@ def vieworder():
         orderid = request.args.get('id')
         subid = request.args.get('subid')
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1448,7 +1150,8 @@ def vieworder():
 
         cur = conn.cursor()
         cur.execute(
-            'SELECT * FROM order_table WHERE user_id =%s AND order_id = %s AND order_sub_id=%s ORDER BY DATE(created_at) DESC',
+            'SELECT * FROM order_table WHERE user_id =%s AND order_id = %s AND order_sub_id=%s ORDER BY DATE('
+            'created_at) DESC',
             (session.get('email'), orderid, subid))
         myorders = cur.fetchall()
         cur.close()
@@ -1467,7 +1170,7 @@ def vieworder():
                 a['autodiscountedprice'] = round(
                     json.loads(myorders[i][3])['service_param']['price'] - autodiscountedprice, 4)
                 a['paidamount'] = json.loads(myorders[i][3])['service_param']['autodiscountedprice']
-            except:
+            except pymysql.Error:
                 a['autodiscountedprice'] = 0
 
             try:
@@ -1475,7 +1178,7 @@ def vieworder():
                 a['paidamount'] = json.loads(myorders[i][3])['service_param']['couponcode_discountedprice']
                 a['couponcode_discountedprice'] = round(
                     json.loads(myorders[i][3])['service_param']['price'] - couponcode_discountedprice, 4)
-            except:
+            except pymysql.Error:
                 a['couponcode_discountedprice'] = 0
 
             pricelist.append(a)
@@ -1490,7 +1193,7 @@ def vieworder():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                myorders=myorders,
                                paramlist=paramlist,
@@ -1506,19 +1209,12 @@ def chat():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
+            userLoggedIn = False
         # table app_config
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1527,14 +1223,7 @@ def chat():
         sub_id = request.args['sub_id']
         session['selected_id_for_chat'] = id
         session['selected_sub_id_for_chat'] = sub_id
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM chats WHERE order_id = %s AND order_sub_id = %s ORDER BY created_at DESC',
                     (id, sub_id))
@@ -1550,7 +1239,7 @@ def chat():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                chats=chats
                                )
@@ -1565,17 +1254,11 @@ def chat():
             path = os.path.join(app.config['UPLOAD_FOLDER'], 'chatuploads', aboutimage.filename)
             dounloadurl = "../static/img/chatuploads/" + aboutimage.filename
             aboutimage.save(path)
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute(
-            'INSERT INTO chats (order_id,sender_id,replyer_id,subject,message,document_url,from_who,to_who,order_sub_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+            'INSERT INTO chats (order_id,sender_id,replyer_id,subject,message,document_url,from_who,to_who,'
+            'order_sub_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
             (orderid, session.get('email'), "", subject, message, dounloadurl, 1, 0, order_sub_id))
         cur.close()
         return redirect(url_for('chat') + '?id=' + orderid + '&sub_id=' + order_sub_id)
@@ -1585,19 +1268,12 @@ def chat():
 def deliverables():
     username = ""
     if session.get('_is_user_logged_in') is True:
-        userlogedin = True
+        userLoggedIn = True
         username = session.get('firstname') + " " + session.get('lastname')
     else:
-        userlogedin = False
+        userLoggedIn = False
     # table app_config
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM app_config')
     appdata = cur.fetchone()
@@ -1607,7 +1283,7 @@ def deliverables():
 
     cur = conn.cursor()
     cur.execute('SELECT * FROM order_table')
-    orders = cur.fetchall()
+    # orders = cur.fetchall()
     cur = conn.cursor()
     cur.execute('SELECT * FROM deliverables WHERE order_id = %s AND order_sub_id = %s ORDER BY created_at DESC',
                 (id, sub_id))
@@ -1624,7 +1300,7 @@ def deliverables():
                            companylinkedin=appdata[11],
                            address=appdata[18],
                            author=appdata[5],
-                           userlogedin=userlogedin,
+                           userlogedin=userLoggedIn,
                            username=username,
                            deliverables=deliverables
                            )
@@ -1635,18 +1311,11 @@ def myaccount():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1659,14 +1328,14 @@ def myaccount():
             cur = conn.cursor()
             cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
             cartitems = cur.fetchall()
-        except:
+        except pymysql.Error:
             cartitems = []
 
         try:
             cur = conn.cursor()
             cur.execute('SELECT * FROM userlogos WHERE user_id =%s', session.get('email'))
             userlogos = cur.fetchall()
-        except:
+        except pymysql.Error:
             userlogos = []
 
         return render_template('myaccount.html',
@@ -1680,7 +1349,7 @@ def myaccount():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                user=user,
                                cartitems=cartitems,
@@ -1698,17 +1367,11 @@ def myaccount():
         city = request.form.get('city')
         zip = request.form.get('Zip')
         phone = request.form.get('Phone')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute(
-            'UPDATE users SET first_name = %s,last_name=%s,sec_email=%s,country=%s,state=%s,houseno=%s,street=%s,city=%s,zipcode=%s,phone=%s WHERE email=%s',
+            'UPDATE users SET first_name = %s,last_name=%s,sec_email=%s,country=%s,state=%s,houseno=%s,street=%s,'
+            'city=%s,zipcode=%s,phone=%s WHERE email=%s',
             (fname, lname, secemail, country, states, hno, street, city, zip, phone, email,))
         cur.close()
         return redirect(url_for('myaccount'))
@@ -1718,14 +1381,7 @@ def myaccount():
 def deleteuserlogo():
     if request.method == 'GET':
         logoid = request.args.get("id")
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('DELETE FROM userlogos WHERE id = %s', logoid)
         cur.close()
@@ -1741,14 +1397,7 @@ def userlogoupload():
             path = os.path.join(app.config['UPLOAD_FOLDER'], 'userlogouploads', userlogo.filename)
             dounloadurl = "/static/img/userlogouploads/" + userlogo.filename
             userlogo.save(path)
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('INSERT INTO userlogos (user_id,logo_url) VALUES (%s,%s)', (session.get('email'), dounloadurl))
         cur.close()
@@ -1762,18 +1411,11 @@ def mywallet():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1789,7 +1431,7 @@ def mywallet():
             cur = conn.cursor()
             cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
             cartitems = cur.fetchall()
-        except:
+        except pymysql.Error:
             cartitems = []
         return render_template('mywallet.html',
                                appname=appdata[1],
@@ -1802,7 +1444,7 @@ def mywallet():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                transactions=transactions,
                                currbal=currbal,
@@ -1811,14 +1453,7 @@ def mywallet():
     if request.method == 'POST':
         amount = request.form.get('amount')
         transaction_type = '0'
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         transaction_id = "AER_EST_TRANS_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -1835,7 +1470,7 @@ def mywallet():
                 cur = conn.cursor()
                 cur.execute('UPDATE users SET wallet_amount=%s WHERE email=%s', (upamount, session.get('email'),))
                 cur.close()
-            elif (transaction_type == "1"):
+            elif transaction_type == "1":
                 cur = conn.cursor()
                 cur.execute('SELECT wallet_amount FROM users WHERE email = %s', (session.get('email')))
                 examount = cur.fetchone()
@@ -1856,18 +1491,11 @@ def mygroups():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1876,7 +1504,7 @@ def mygroups():
             cur = conn.cursor()
             cur.execute('SELECT * FROM cart_table WHERE user_id =%s', session.get('email'))
             cartitems = cur.fetchall()
-        except:
+        except pymysql.Error:
             cartitems = []
         grp_list = []
         try:
@@ -1909,7 +1537,7 @@ def mygroups():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                grp_list=grp_list,
                                cartitems=cartitems
@@ -1921,18 +1549,11 @@ def viewgroup():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
@@ -1956,7 +1577,7 @@ def viewgroup():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                users=users,
                                allusers=allusers
@@ -1966,14 +1587,7 @@ def viewgroup():
         user = request.form.get('employee')
         grpname = request.form.get('groupname')
 
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('INSERT INTO user_groups (user_id,group_id,group_name,role) VALUES (%s,%s,%s,%s)',
@@ -1991,14 +1605,7 @@ def deleteuserfromgrp():
     grpid = request.args.get('grpid')
     grpname = request.args.get('grpname')
     userid = request.args.get('userid')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     try:
         cur = conn.cursor()
         cur.execute('DELETE FROM user_groups WHERE user_id=%s AND group_id=%s ', (userid, grpid))
@@ -2015,32 +1622,18 @@ def viewgrouptransactions():
     if request.method == 'GET':
         username = ""
         if session.get('_is_user_logged_in') is True:
-            userlogedin = True
+            userLoggedIn = True
             username = session.get('firstname') + " " + session.get('lastname')
         else:
-            userlogedin = False
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+            userLoggedIn = False
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM app_config')
         appdata = cur.fetchone()
         cur.close()
 
         grpid = request.args.get('id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM group_wallet_transacctions WHERE group_id = %s', grpid)
         transactions = cur.fetchall()
@@ -2058,7 +1651,7 @@ def viewgrouptransactions():
                                companylinkedin=appdata[11],
                                address=appdata[18],
                                author=appdata[5],
-                               userlogedin=userlogedin,
+                               userlogedin=userLoggedIn,
                                username=username,
                                transactions=transactions,
                                currbal=currbal
@@ -2066,14 +1659,7 @@ def viewgrouptransactions():
     if request.method == 'POST':
         grpid = request.form.get('grpid')
         amount = request.form.get('amount')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         group_transaction_id = "AER_EST_GRP_TRANS_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -2082,7 +1668,7 @@ def viewgrouptransactions():
             cur.close()
             if user:
                 cur = conn.cursor()
-                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (grpid))
+                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', grpid)
                 amt = cur.fetchone()
                 upamount = amt[0] + int(amount)
                 cur.close()
@@ -2091,7 +1677,8 @@ def viewgrouptransactions():
                 cur.close()
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,'
+                    'group_user_id) VALUES(%s,%s,%s,%s,%s)',
                     (group_transaction_id, grpid, amount, 1, session.get('email')))
                 cur.close()
                 return redirect(url_for('viewgrouptransactions') + '?id=' + grpid)
@@ -2107,19 +1694,12 @@ def forgotpass():
         return render_template('forgotpassword.html')
     if request.method == 'POST':
         email = request.form.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE email = %s', email)
         user = cur.fetchone()
         if user:
-            content = "Greetings from aerial estimation, Please find password Reset Link for your account : " + email
+            # content = "Greetings from aerial estimation, Please find password Reset Link for your account : " + email
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
             # mail.ehlo()
             # mail.starttls()
@@ -2139,14 +1719,7 @@ def creategrp():
     if request.method == 'POST':
         group_name = request.values.get('groupname')
         user_id = session.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         group_id = "AER_EST_GRP_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -2173,14 +1746,7 @@ def admin_login():
 
         username = request.values.get('username')
         password = request.values.get('password')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM admin WHERE username = %s AND password = %s', (username, password))
         account = cur.fetchone()
@@ -2206,14 +1772,7 @@ def admin_login():
 @app.route('/admin/dashboard')
 def admin_dash():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM users')
         users = cur.fetchall()
@@ -2326,30 +1885,18 @@ def admin_site_settings():
                 path = os.path.join(app.config['UPLOAD_FOLDER'], "logo.png")
                 file1.save(path)
                 # update into table app_config
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute(
-                'UPDATE app_config SET appname=%s, appmeta=%s, appmetakeyword=%s, companymail=%s,companyphone=%s,companytwitter =%s,companyfacebook=%s,companyinstagram = %s, companylinkedin=%s, address	= %s, iframe= %s, appwhatsappnumber	= %s, whatsappdefaulttext= %s ,applogo = %s WHERE id=1',
+                'UPDATE app_config SET appname=%s, appmeta=%s, appmetakeyword=%s, companymail=%s,companyphone=%s,'
+                'companytwitter =%s,companyfacebook=%s,companyinstagram = %s, companylinkedin=%s, address	= %s, '
+                'iframe= %s, appwhatsappnumber	= %s, whatsappdefaulttext= %s ,applogo = %s WHERE id=1',
                 (sitename, sitemeta, sitemetakeywords, siteemail, sitephone, sitetwitter, sitefacebook, siteinstagram,
                  sitelinkedin, siteAddress, sitelocation, sitewhatsappnumber, sitewhatsappdefaulttext,
                  "http://aerialestimation.doczapp.in/static/img/logo.png"))
             cur.close()
             # table app_config
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM app_config')
             appdata = cur.fetchone()
@@ -2357,14 +1904,7 @@ def admin_site_settings():
             return render_template('Admin/sitesettings.html', appdata=appdata)
         elif request.method == 'GET':
             # table app_config
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM app_config')
             appdata = cur.fetchone()
@@ -2377,14 +1917,7 @@ def admin_site_settings():
 @app.route('/admin/edithomepage/', methods=['GET', 'POST'])
 def admin_crm_home_edit():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('select * from app_config')
         appdata = cur.fetchone()
@@ -2404,17 +1937,11 @@ def admin_crm_home_edit_post():
         widget2desc = request.values.get('widget2desc')
         widget3title = request.values.get('widget3title')
         widget3desc = request.values.get('widget3desc')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute(
-            'UPDATE app_config SET widgetonetitle=%s, widgetonedescription=%s, widgettwotitle=%s, widgettwodescription=%s,widgetthreetitle=%s,widgetthreedescription =%s WHERE id=1',
+            'UPDATE app_config SET widgetonetitle=%s, widgetonedescription=%s, widgettwotitle=%s, '
+            'widgettwodescription=%s,widgetthreetitle=%s,widgetthreedescription =%s WHERE id=1',
             (widget1title, widget1desc, widget2title, widget2desc, widget3title, widget3desc))
         cur.close()
         return redirect(url_for('admin_crm_home_edit'))
@@ -2425,14 +1952,7 @@ def admin_crm_home_edit_post():
 @app.route('/admin/editaboutpage/')
 def admin_crm_about_edit():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('select * from about')
         aboutdata = cur.fetchone()
@@ -2445,14 +1965,7 @@ def admin_crm_about_edit():
 @app.route('/admin/editfaqpage/', methods=['GET', 'POST'])
 def admin_crm_faq_edit():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('select * from faqs')
         faqs = cur.fetchall()
@@ -2465,14 +1978,7 @@ def addfaq():
     if request.method == 'POST':
         question = request.values.get('question')
         answer = request.values.get('answer')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('INSERT INTO faqs (question,answer) VALUES (%s,%s)', (question, answer))
         cur.close()
@@ -2485,16 +1991,9 @@ def addfaq():
 def delfaq():
     if request.method == 'GET':
         id = request.values.get('id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
-        cur.execute('DELETE FROM faqs WHERE id = %s', (id))
+        cur.execute('DELETE FROM faqs WHERE id = %s', id)
         cur.close()
         return redirect(url_for('admin_crm_faq_edit'))
 
@@ -2519,17 +2018,12 @@ def admin_crm_about_edit_post():
         if aboutimage.filename:
             path = os.path.join(app.config['UPLOAD_FOLDER'], "about.png")
             aboutimage.save(path)
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute(
-            'UPDATE about SET aboutpagetitle=%s, aboutpagemeta=%s, aboutpagemetakeyword=%s, about_title=%s,about_description=%s,runner1count =%s,runner1desc =%s,runner2count=%s,runner2desc=%s,runner3count=%s,runner3desc=%s,runner4count=%s,runner4desc=%s, aboutimage=%s WHERE id=1',
+            'UPDATE about SET aboutpagetitle=%s, aboutpagemeta=%s, aboutpagemetakeyword=%s, about_title=%s,'
+            'about_description=%s,runner1count =%s,runner1desc =%s,runner2count=%s,runner2desc=%s,runner3count=%s,'
+            'runner3desc=%s,runner4count=%s,runner4desc=%s, aboutimage=%s WHERE id=1',
             (pagetitle, pagemeta, pagemetakeywords, abouttitle, aboutdesc, run1count, run1desc, run2count, run2desc,
              run3count, run3desc, run4count, run4desc, "http://127.0.0.1:5000/static/img/about.png"))
         cur.close()
@@ -2549,14 +2043,7 @@ def admin_crm_services_edit():
 @app.route('/admin/editpricingpage/')
 def admin_crm_pricing_edit():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM services')
         service = cur.fetchall()
@@ -2571,15 +2058,8 @@ def managepricingparams():
     if request.method == 'GET':
         if session.get('_is_logged_in') is True:
             id = request.args.get('id')
-            name = request.args.get('name')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            # name = request.args.get('name')
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM pricingparams WHERE service_id= %s', id)
             pricingparams = cur.fetchall()
@@ -2591,14 +2071,7 @@ def managepricingparams():
         serid = request.form.get('serid')
         sername = request.form.get('sername')
         param = request.form.get('param')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('INSERT INTO pricingparams (service_id,serviceparam) VALUES (%s,%s)', (serid, param))
         cur.close()
@@ -2611,14 +2084,7 @@ def deletepricingparam():
         id = request.args.get('id')
         serid = request.args.get('serid')
         name = request.args.get('name')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('DELETE FROM pricingparams WHERE slno = %s', id)
         cur.close()
@@ -2628,14 +2094,7 @@ def deletepricingparam():
 @app.route('/admin/manageblog/', methods=['GET', 'POST'])
 def manageblog():
     blgid = request.args.get('id')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('SELECT * FROM blog WHERE id =%s', blgid)
     blgdata = cur.fetchone()
@@ -2645,28 +2104,14 @@ def manageblog():
 @app.route('/admin/manageaboutservices/', methods=['GET', 'POST'])
 def aboutservicemanage():
     if request.method == 'GET':
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM aboutservice')
         aboutservice = cur.fetchone()
         return render_template('/Admin/manageaboutservices.html', aboutservice=aboutservice)
     if request.method == 'POST':
         description = request.form.get('description')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         try:
             cur.execute('UPDATE aboutservice SET data = %s WHERE slno = 1', description)
@@ -2679,14 +2124,7 @@ def aboutservicemanage():
 @app.route('/admin/deleteblog/', methods=['GET', 'POST'])
 def delblog():
     blgid = request.args.get('id')
-    conn = pymysql.Connect(
-        host="localhost",
-        port=3306,
-        user=DBUserName,
-        password="",
-        db=DBName,
-        autocommit=True
-    )
+    conn = connectMysql()
     cur = conn.cursor()
     cur.execute('DELETE FROM blog WHERE id = %s', blgid)
     cur.close()
@@ -2706,14 +2144,7 @@ def addblog():
             path = os.path.join(app.config['UPLOAD_FOLDER'], 'bloguploads', blogimage.filename)
             dounloadurl = "/static/img/bloguploads/" + blogimage.filename
             blogimage.save(path)
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('INSERT INTO blog (blog_title,blog_description,blog_image,blog_seo_tags) VALUES (%s,%s,%s,%s)',
                         (request.form.get('title'), request.form.get('description'), dounloadurl,
@@ -2727,14 +2158,7 @@ def addblog():
 @app.route('/admin/editblogpage/')
 def admin_crm_blog_edit():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM blog')
         blogs = cur.fetchall()
@@ -2774,14 +2198,7 @@ def user_logout():
 def Orders_admin():
     if session.get('_is_logged_in') is True:
         usernames = []
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table')
         orders = cur.fetchall()
@@ -2798,14 +2215,7 @@ def Orders_admin():
 @app.route('/admin/custorders')
 def custorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         id = request.args.get('id')
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE user_id = %s', id)
@@ -2818,14 +2228,7 @@ def custorders_admin():
 @app.route('/admin/pendingorders')
 def pending_orders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE progress = %s', 0)
         orders = cur.fetchall()
@@ -2837,14 +2240,7 @@ def pending_orders_admin():
 @app.route('/admin/processingorders')
 def processingorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE progress = %s', 1)
         orders = cur.fetchall()
@@ -2856,14 +2252,7 @@ def processingorders_admin():
 @app.route('/admin/completedorders')
 def completedorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE progress = %s', 2)
         orders = cur.fetchall()
@@ -2875,14 +2264,7 @@ def completedorders_admin():
 @app.route('/admin/cancelledorders')
 def cancelledorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE progress = %s', 3)
         orders = cur.fetchall()
@@ -2894,14 +2276,7 @@ def cancelledorders_admin():
 @app.route('/admin/verificationorders')
 def verificationorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE progress = %s', 4)
         orders = cur.fetchall()
@@ -2913,14 +2288,7 @@ def verificationorders_admin():
 @app.route('/admin/unassignedorders')
 def unassignedorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE assigned = %s', 0)
         orders = cur.fetchall()
@@ -2932,14 +2300,7 @@ def unassignedorders_admin():
 @app.route('/admin/myassignedorders')
 def myassignedorders_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         myid = session.get('username')
         myfname = session.get('name')
         assignedto = myid + " (" + myfname + ")"
@@ -2954,14 +2315,7 @@ def myassignedorders_admin():
 @app.route('/admin/users')
 def Users_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM users')
         users = cur.fetchall()
@@ -2974,14 +2328,7 @@ def Users_admin():
 def deleteuser():
     if session.get('_is_logged_in') is True:
         id = request.args['id']
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('DELETE FROM users WHERE email = %s', id)
         return redirect(url_for('Users_admin'))
@@ -2992,14 +2339,7 @@ def deleteuser():
 @app.route('/admin/Employees')
 def Admin_Employees():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM admin')
         employees = cur.fetchall()
@@ -3012,14 +2352,7 @@ def Admin_Employees():
 def admin_deleteemployee():
     if session.get('_is_logged_in') is True:
         id = request.args['id']
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('DELETE FROM admin WHERE username=%s', id)
         return redirect(url_for('Admin_Employees'))
@@ -3030,14 +2363,7 @@ def admin_deleteemployee():
 @app.route('/admin/add_employee')
 def admin_add_employee():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        # conn = connectMysql()
         return render_template('/Admin/addemployee.html')
     else:
         return redirect(url_for('admin_login'))
@@ -3059,14 +2385,7 @@ def admin_add_employee_controller():
                 role = 3
             elif role == "SEO":
                 role = 4
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('INSERT INTO admin (username,password,role,name) VALUES (%s,%s,%s,%s)',
                         (email, password, role, name))
@@ -3086,18 +2405,10 @@ def admin_vieworder():
         session['recent_order_id'] = id
         session['recent_ordered_user_id'] = ordereduser
         session['recent_order_sub_id'] = ordersubid
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM order_table WHERE order_id=%s AND order_sub_id=%s', (id, ordersubid))
         orders = cur.fetchone()
-        a = []
         a = json.loads(orders[3])
         cur = conn.cursor()
         cur.execute('SELECT * FROM admin WHERE role=%s', 3)
@@ -3118,43 +2429,38 @@ def admin_updateorderstatus():
             employeeid = request.values.get('employee')
             id = session.get('recent_order_id')
             assignee = session.get('username')
-            if (status == "Pending"):
+            if status == "Pending":
                 status = 0
-            elif (status == "Processing"):
+            elif status == "Processing":
                 status = 1
-            elif (status == "completed"):
+            elif status == "completed":
                 status = 2
-            elif (status == "Cancelled"):
+            elif status == "Cancelled":
                 status = 3
-            elif (status == "Verification Needed"):
+            elif status == "Verification Needed":
                 status = 4
 
-            if (employeeid == "Un-assign"):
+            if employeeid == "Un-assign":
                 assigned = 0
                 employeeid = ""
                 assignee = ""
-            elif (employeeid == "Not Assigned"):
+            elif employeeid == "Not Assigned":
                 assigned = 0
                 employeeid = ""
                 assignee = ""
             else:
                 assigned = 1
 
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute(
-                'UPDATE order_table SET progress = %s,assigned = %s,assigned_to=%s,assigned_by=%s,message=%s WHERE order_id=%s AND order_sub_id=%s',
+                'UPDATE order_table SET progress = %s,assigned = %s,assigned_to=%s,assigned_by=%s,message=%s WHERE '
+                'order_id=%s AND order_sub_id=%s',
                 (status, assigned, employeeid, assignee, message, id, ordersubid))
             cur.close()
             # send mail
-            # content = "Greetings from aerial estimation,\nStatus for your order with ID :"+id+" is changed to "+request.values.get('status')
+            # content = "Greetings from aerial estimation,\nStatus for your order with ID
+            # :"+id+" is changed to "+request.values.get('status')
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
             # mail.ehlo()
             # mail.starttls()
@@ -3175,14 +2481,7 @@ def admin_updateorderstatus():
 @app.route('/admin/editservicepage')
 def Admin_editservicepage():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM services')
         service = cur.fetchall()
@@ -3209,17 +2508,11 @@ def admin_add_service():
                 serviceenabled = 1
             else:
                 serviceenabled = 0
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute(
-                'INSERT INTO services (service_title,service_desc,isactive,image_url,ismulti,price) VALUES (%s,%s,%s,%s,%s,%s)',
+                'INSERT INTO services (service_title,service_desc,isactive,image_url,ismulti,price) VALUES (%s,%s,%s,'
+                '%s,%s,%s)',
                 (title, desc, serviceenabled, dounloadurl, multienabled, price))
             cur.close()
             return redirect(url_for('Admin_editservicepage'))
@@ -3234,14 +2527,7 @@ def admin_add_service():
 def admin_deleteservice():
     if session.get('_is_logged_in') is True:
         id = request.args['id']
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('DELETE FROM services WHERE id=%s', id)
         cur.close()
@@ -3259,14 +2545,7 @@ def admin_updateservice():
         if request.method == 'GET':
             id = request.args['id']
             session['last_selected_service_id_to_update'] = id
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM services WHERE id=%s', id)
             servicedetails = cur.fetchone()
@@ -3290,18 +2569,12 @@ def admin_updateservice():
                 serviceenabled = 1
             else:
                 serviceenabled = 0
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             if aboutimage.filename:
                 cur = conn.cursor()
                 cur.execute(
-                    'UPDATE services SET service_title=%s,service_desc=%s,isactive=%s,image_url=%s,ismulti=%s,price=%s WHERE id=%s',
+                    'UPDATE services SET service_title=%s,service_desc=%s,isactive=%s,image_url=%s,ismulti=%s,'
+                    'price=%s WHERE id=%s',
                     (title, desc, serviceenabled, dounloadurl, multienabled, price, id))
                 cur.close()
             else:
@@ -3321,14 +2594,7 @@ def admin_manageserviceparams():
         if request.method == 'GET':
             id = request.args['id']
             session['last_selected_service_id_to_update'] = id
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM serviceparams WHERE id=%s', id)
             serviceparams = cur.fetchall()
@@ -3341,14 +2607,7 @@ def admin_manageserviceparams():
             parameterheading = request.form.get('parameterheading')
             type = request.form.get('type')
             Price = request.form.get('price')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('UPDATE serviceparams SET param=%s,paramtype=%s,param_heading=%s,price=%s WHERE slno=%s',
                         (parameter, type, parameterheading, Price, paramid))
@@ -3363,14 +2622,7 @@ def admin_add_service_param():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             id = session.get('last_selected_service_id_to_update')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             return render_template('/Admin/addserviceparams.html')
         else:
             id = session.get('last_selected_service_id_to_update')
@@ -3387,14 +2639,7 @@ def admin_add_service_param():
                 param_type = 3
             if request.values.get('param_type') == 'Check Box':
                 param_type = 4
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('INSERT INTO serviceparams (id,param,paramtype,param_heading,price) VALUES (%s,%s,%s,%s,%s)',
                         (id, param, param_type, param_heading, price))
@@ -3410,14 +2655,7 @@ def admin_deleteserviceparam():
         id = session.get('last_selected_service_id_to_update')
         if request.method == 'GET':
             paramid = request.args['id']
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('DELETE FROM serviceparams WHERE slno=%s', paramid)
             cur.close()
@@ -3431,17 +2669,11 @@ def admin_deleteserviceparam():
 @app.route('/admin/Usergroups')
 def Usergroups_admin():
     if session.get('_is_logged_in') is True:
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute(
-            'SELECT * FROM user_groups JOIN group_wallet ON group_wallet.group_id=user_groups.group_id WHERE user_groups.role=1')
+            'SELECT * FROM user_groups JOIN group_wallet ON group_wallet.group_id=user_groups.group_id WHERE '
+            'user_groups.role=1')
         groups = cur.fetchall()
         return render_template('/Admin/Usergroups.html', groups=groups)
     else:
@@ -3453,14 +2685,7 @@ def viewgroupUser_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             grpid = request.args.get('id')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM user_groups WHERE group_id = %s', grpid)
             users = cur.fetchall()
@@ -3474,14 +2699,7 @@ def vviewgrouptransactions_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             grpid = request.args.get('id')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM group_wallet_transacctions WHERE group_id = %s', grpid)
             transactions = cur.fetchall()
@@ -3494,19 +2712,12 @@ def vviewgrouptransactions_admin():
             group_id = request.form.get('userid')
             amount = request.form.get('amount')
             transaction_type = request.form.get('type')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             group_transaction_id = "AER_EST_GRP_TRANS_ID-" + str(randrange(111111, 999999))
             try:
                 if transaction_type == "1":
                     cur = conn.cursor()
-                    cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (group_id))
+                    cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', group_id)
                     amt = cur.fetchone()
                     upamount = amt[0] + int(amount)
                     cur.close()
@@ -3515,13 +2726,14 @@ def vviewgrouptransactions_admin():
                     cur.close()
                     cur = conn.cursor()
                     cur.execute(
-                        'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                        'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,'
+                        'transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
                         (group_transaction_id, group_id, amount, 1, "Admin"))
                     cur.close()
                     return redirect(url_for('vviewgrouptransactions_admin') + "?id=" + group_id)
                 if transaction_type == "0":
                     cur = conn.cursor()
-                    cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (group_id))
+                    cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', group_id)
                     amt = cur.fetchone()
                     upamount = amt[0] - int(amount)
                     cur.close()
@@ -3530,7 +2742,8 @@ def vviewgrouptransactions_admin():
                     cur.close()
                     cur = conn.cursor()
                     cur.execute(
-                        'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                        'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,'
+                        'transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
                         (group_transaction_id, group_id, amount, 0, "Admin"))
                     cur.close()
                     return redirect(url_for('vviewgrouptransactions_admin') + "?id=" + group_id)
@@ -3548,14 +2761,7 @@ def transactions_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             userid = request.args.get('id')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM transaction WHERE user_id = %s', userid)
             transactions = cur.fetchall()
@@ -3568,19 +2774,13 @@ def transactions_admin():
             userid = request.form.get('userid')
             amount = request.form.get('amount')
             transaction_type = request.form.get('type')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             transaction_id = "AER_EST_TRANS_ID-" + str(randrange(111111, 999999))
             try:
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO transaction(transaction_id,user_id,amount_details,transaction_type)VALUES (%s,%s,%s,%s)',
+                    'INSERT INTO transaction(transaction_id,user_id,amount_details,transaction_type)VALUES (%s,%s,%s,'
+                    '%s)',
                     (transaction_id, userid, amount, transaction_type))
                 cur.close()
                 if transaction_type == "0":
@@ -3593,9 +2793,9 @@ def transactions_admin():
                     cur.execute('UPDATE users SET wallet_amount=%s WHERE email=%s', (upamount, userid,))
                     cur.close()
                     return redirect(url_for('transactions_admin') + "?id=" + userid)
-                elif (transaction_type == "1"):
+                elif transaction_type == "1":
                     cur = conn.cursor()
-                    cur.execute('SELECT wallet_amount FROM users WHERE email = %s', (userid))
+                    cur.execute('SELECT wallet_amount FROM users WHERE email = %s', userid)
                     examount = cur.fetchone()
                     cur.close()
                     upamount = examount[0] - int(amount)
@@ -3615,14 +2815,7 @@ def transactions_admin():
 def contactrequests_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM contactrequests')
             contactreq = cur.fetchall()
@@ -3639,14 +2832,7 @@ def chat_admin():
             sub_id = request.args['order_sub_id']
             session['selected_id_for_chat'] = id
             session['selected_sub_id_for_chat'] = sub_id
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM order_table')
             orders = cur.fetchall()
@@ -3676,21 +2862,16 @@ def chatinsert_admin():
                 path = os.path.join(app.config['UPLOAD_FOLDER'], 'chatuploads', aboutimage.filename)
                 dounloadurl = "../static/img/chatuploads/" + aboutimage.filename
                 aboutimage.save(path)
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute(
-                'INSERT INTO chats (order_id,sender_id,replyer_id,subject,message,document_url,from_who,to_who,order_sub_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                'INSERT INTO chats (order_id,sender_id,replyer_id,subject,message,document_url,from_who,to_who,'
+                'order_sub_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                 (id, ordereduser, myusername, subject, message, dounloadurl, 1, 0, subid))
             cur.close()
             # send mail
-            # content = "Greetings from aerial estimation,\nYou have a new message for your order with ID :" + id + "\nSubject : " + subject+"\nMessage : "+message+"\nAttachment : "+aboutimage.filename
+            # content = "Greetings from aerial estimation,\nYou have a new message for your order with ID
+            # :" + id + "\nSubject : " + subject+"\nMessage : "+message+"\nAttachment : "+aboutimage.filename
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
             # mail.ehlo()
             # mail.starttls()
@@ -3714,14 +2895,7 @@ def deliverables_admin():
             sub_id = request.args['order_sub_id']
             session['selected_id_for_chat'] = id
             session['selected_sub_id_for_chat'] = sub_id
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM order_table')
             orders = cur.fetchall()
@@ -3744,28 +2918,22 @@ def deliverableinsert_admin():
             myusername = session.get('username')
             ordereduser = session.get('recent_ordered_user_id')
             title = request.form.get('title')
-            addemail = request.form.get('addemail')
+            # addemail = request.form.get('addemail')
             aboutimage = request.files['file']
             dounloadurl = ""
             if aboutimage.filename:
                 path = os.path.join(app.config['UPLOAD_FOLDER'], 'deliverableuploads', aboutimage.filename)
                 dounloadurl = "../static/img/deliverableuploads/" + aboutimage.filename
                 aboutimage.save(path)
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute(
                 'INSERT INTO deliverables (order_id,order_sub_id,doc_name,doc_url,uploaded_by) VALUES (%s,%s,%s,%s,%s)',
                 (id, subid, title, dounloadurl, myusername))
             cur.close()
             # send mail
-            content = "Greetings from aerial estimation,\nDeliverables for your order with ID :" + id + "is delivered please login to finf attachments"
+            # content = "Greetings from aerial estimation,\nDeliverables for your order with ID :" \
+            #           + id + "is delivered please login to finf attachments"
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
             # mail.ehlo()
             # mail.starttls()
@@ -3776,7 +2944,8 @@ def deliverableinsert_admin():
             # mail.sendmail("devsandy12@gmail.com", ordereduser, content)
             # mail.close()
             # if addemail!="" or addemail!=None:
-            # content = "Greetings from aerial estimation,\nDeliverables for your order with ID :" + id + "is delivered please login to finf attachments"
+            # content = "Greetings from aerial estimation,\nDeliverables for your order with ID :" + id
+            # + "is delivered please login to finf attachments"
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
             # mail.ehlo()
             # mail.starttls()
@@ -3800,16 +2969,9 @@ def deletedeliverable_admin():
         if request.method == 'GET':
             id = session.get('selected_id_for_chat')
             ordereduser = session.get('recent_ordered_user_id')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
-            cur.execute('DELETE FROM deliverables WHERE id=%s', (delid))
+            cur.execute('DELETE FROM deliverables WHERE id=%s', delid)
             cur.close()
             return redirect(
                 url_for('deliverables_admin') + "?id=" + id + "&ordered_user=" + ordereduser + "&order_sub_id=" + subid)
@@ -3821,14 +2983,7 @@ def deletedeliverable_admin():
 def coupon_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM coupon_code')
             coupons = cur.fetchall()
@@ -3844,21 +2999,15 @@ def coupon_admin():
             unlimited = request.form.get('unlimited')
             qty = request.form.get('qty')
             usernames = request.form.get('usernames')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             try:
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO coupon_code (for_user,coupon_name,coupon_code,discount_rate,is_enabled,qty,is_unlimited) VALUES(%s,%s,%s,%s,%s,%s,%s)',
+                    'INSERT INTO coupon_code (for_user,coupon_name,coupon_code,discount_rate,is_enabled,qty,'
+                    'is_unlimited) VALUES(%s,%s,%s,%s,%s,%s,%s)',
                     (usernames, couponname, couponcode, discountrate, enabled, qty, unlimited))
                 cur.close()
-            except pymysql.Error as e:
+            except pymysql.Error:
                 flash('User already given a code')
             cur = conn.cursor()
             cur.execute('SELECT * FROM coupon_code')
@@ -3876,14 +3025,7 @@ def coupon_admin():
 def deletecoupon_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             uid = request.args.get('id')
             cur = conn.cursor()
             cur.execute('DELETE FROM coupon_code WHERE for_user = %s', uid)
@@ -3897,14 +3039,7 @@ def deletecoupon_admin():
 def changecouponstatus_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             uid = request.args.get('id')
             cur = conn.cursor()
             cur.execute('SELECT is_enabled FROM coupon_code WHERE for_user = %s', uid)
@@ -3926,27 +3061,13 @@ def changecouponstatus_admin():
 def autodiscount_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM discount_group')
             discount_groups = cur.fetchall()
             return render_template('/Admin/autodiscount.html', discountgroups=discount_groups)
         if request.method == 'POST':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             groupname = request.form.get('groupname')
             discountrate = request.form.get('discountrate')
             enabled = request.form.get('enabled')
@@ -3966,29 +3087,17 @@ def autodiscountsearch_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             search = request.args.get('search')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             query = (
-                    "SELECT * FROM `discount_group_users` JOIN discount_group ON discount_group_users.discount_group_id=discount_group.id WHERE discount_group_user_id LIKE '" + search + "%';")
+                    "SELECT * FROM `discount_group_users` JOIN discount_group ON "
+                    "discount_group_users.discount_group_id=discount_group.id WHERE discount_group_user_id LIKE '" +
+                    search + "%';")
             cur.execute(query)
             discount_groups = cur.fetchall()
             return render_template('/Admin/autodiscountsearch.html', discountgroups=discount_groups)
         if request.method == 'POST':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             groupname = request.form.get('groupname')
             discountrate = request.form.get('discountrate')
             enabled = request.form.get('enabled')
@@ -4007,14 +3116,7 @@ def autodiscountsearch_admin():
 def changedgroupstatus_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             gid = request.args.get('id')
             cur = conn.cursor()
             cur.execute('SELECT isenabled FROM discount_group WHERE id = %s', gid)
@@ -4036,14 +3138,7 @@ def changedgroupstatus_admin():
 def deletedgroup_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             uid = request.args.get('id')
             cur = conn.cursor()
             cur.execute('DELETE FROM discount_group WHERE id = %s', uid)
@@ -4057,18 +3152,12 @@ def deletedgroup_admin():
 def manageusersdgroup_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             dgrpid = request.args.get('id')
             cur = conn.cursor()
             cur.execute(
-                'SELECT * FROM discount_group_users JOIN users ON discount_group_users.discount_group_user_id=users.email WHERE discount_group_id=%s',
+                'SELECT * FROM discount_group_users JOIN users ON '
+                'discount_group_users.discount_group_user_id=users.email WHERE discount_group_id=%s',
                 dgrpid)
             users = cur.fetchall()
             cur = conn.cursor()
@@ -4076,14 +3165,7 @@ def manageusersdgroup_admin():
             usersall = cur.fetchall()
             return render_template('/Admin/manageusersdgroup.html', users=users, usersall=usersall)
         if request.method == 'POST':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             dgrpid = request.form.get('groupid')
             dgrpuserid = request.form.get('dgrpuserid')
             grpname = request.form.get('grpname')
@@ -4107,14 +3189,7 @@ def manageusersdgroup_admin():
 def deletedgroupuser_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             uid = request.args.get('id')
             userid = request.args.get('userid')
             try:
@@ -4137,22 +3212,15 @@ def deletedgroupuser_admin():
 def managecustomers_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             uid = request.args.get('id')
             try:
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM users WHERE email = %s', (uid))
+                cur.execute('SELECT * FROM users WHERE email = %s', uid)
                 userdetails = cur.fetchone()
                 cur.close()
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM order_table WHERE user_id = %s', (uid))
+                cur.execute('SELECT * FROM order_table WHERE user_id = %s', uid)
                 userorders = cur.fetchall()
                 cur.close()
             except pymysql.Error as e:
@@ -4166,14 +3234,7 @@ def managecustomers_admin():
 def wallettransactions_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             totalspent = 0
             listspent = []
             cur = conn.cursor()
@@ -4184,8 +3245,8 @@ def wallettransactions_admin():
                 cur.execute('SELECT amount_details FROM transaction WHERE user_id=%s AND transaction_type=%s',
                             (user[i][2], 0))
                 spentmoney = cur.fetchall()
-                for i in range(len(spentmoney)):
-                    totalspent = totalspent + spentmoney[i][0]
+                for j in range(len(spentmoney)):
+                    totalspent = totalspent + spentmoney[j][0]
                 listspent.append(totalspent)
                 totalspent = 0
             return render_template('/Admin/wallettransactions.html', user=user, listspent=listspent)
@@ -4198,14 +3259,7 @@ def viewtransactionsingle_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
             tranid = request.args.get('id')
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('SELECT * FROM transaction WHERE transaction_id = %s', tranid)
             transactions = cur.fetchone()
@@ -4222,14 +3276,7 @@ def viewtransactionsingle_admin():
 def updatecustomer_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'POST':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             firstname = request.form.get('firstname')
             lastname = request.form.get('lastname')
             email = request.form.get('email')
@@ -4238,7 +3285,8 @@ def updatecustomer_admin():
             billingaddress = request.form.get('billingaddress')
             cur = conn.cursor()
             cur.execute(
-                'UPDATE users SET first_name=%s,last_name=%s,password=%s,sec_email=%s,shipping_address=%s WHERE email=%s',
+                'UPDATE users SET first_name=%s,last_name=%s,password=%s,sec_email=%s,shipping_address=%s WHERE '
+                'email=%s',
                 (firstname, lastname, password, secondarymail, billingaddress, email))
             cur.close()
             return redirect(url_for('managecustomers_admin') + "?id=" + email)
@@ -4250,19 +3298,12 @@ def updatecustomer_admin():
 def resetpasswordlink_admin():
     if session.get('_is_logged_in') is True:
         if request.method == 'GET':
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            # conn = connectMysql()
             id = request.args.get('id')
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM users WHERE email = %s', id)
-            account = cur.fetchone()
-            cur.close()
+            # cur = conn.cursor()
+            # cur.execute('SELECT * FROM users WHERE email = %s', id)
+            # account = cur.fetchone()
+            # cur.close()
             # if account:
             # content = "Greetings from aerial estimation, Please find password Reset Link for your account : "+id
             # mail = smtplib.SMTP('smtp.gmail.com', 587)
@@ -4290,19 +3331,12 @@ def create_grp_transaction():
         group_id = data.get('grpid')
         amount = data.get('amount')
         transaction_type = '0'
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         group_transaction_id = "AER_EST_GRP_TRANS_ID-" + str(randrange(111111, 999999))
         try:
             if transaction_type == "1":
                 cur = conn.cursor()
-                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (group_id))
+                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', group_id)
                 amt = cur.fetchone()
                 upamount = amt[0] + int(amount)
                 cur.close()
@@ -4311,13 +3345,14 @@ def create_grp_transaction():
                 cur.close()
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,'
+                    'group_user_id) VALUES(%s,%s,%s,%s,%s)',
                     (group_transaction_id, group_id, amount, 1, "Admin"))
                 cur.close()
                 return redirect(url_for('vviewgrouptransactions_admin') + "?id=" + group_id)
             if transaction_type == "0":
                 cur = conn.cursor()
-                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (group_id))
+                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', group_id)
                 amt = cur.fetchone()
                 upamount = amt[0] - int(amount)
                 cur.close()
@@ -4326,7 +3361,8 @@ def create_grp_transaction():
                 cur.close()
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,'
+                    'group_user_id) VALUES(%s,%s,%s,%s,%s)',
                     (group_transaction_id, group_id, amount, 0, user_id))
                 cur.close()
                 return jsonify(
@@ -4350,14 +3386,7 @@ def register():
         last_name = data.get('lastname')
         email = data.get('email')
         password = data.get('password')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('INSERT INTO users(first_name,last_name,email,password)VALUES(%s,%s,%s,%s)',
@@ -4382,14 +3411,7 @@ def login():
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('SELECT * FROM users WHERE email = %s AND password = %s', (email, password))
@@ -4425,22 +3447,15 @@ def getuserprofile():
     if request.method == 'POST':
         data = request.get_json()
         email = data.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM users WHERE email = %s', (email))
+            cur.execute('SELECT * FROM users WHERE email = %s', email)
             acct = cur.fetchone()
             cur.close()
             if acct:
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM user_groups WHERE user_id = %s', (email))
+                cur.execute('SELECT * FROM user_groups WHERE user_id = %s', email)
                 groups = cur.fetchall()
                 cur.close()
                 return jsonify({
@@ -4475,14 +3490,7 @@ def updateuser():
         last_name = data.get('last_name')
         email = data.get('email')
         sec_email = data.get('sec_email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('UPDATE users SET first_name=%s,last_name=%s,sec_email=%s WHERE email=%s',
@@ -4508,14 +3516,7 @@ def updateshippingaddress():
         data = request.get_json()
         email = data.get('email')
         shipping_address = data.get('shipping_address')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('UPDATE users SET shipping_address=%s WHERE email=%s', (shipping_address, email))
@@ -4539,22 +3540,16 @@ def updatepassword():
     if request.method == 'POST':
         data = request.get_json()
         email = data.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute("SELECT * FROM users WHERE email = %s", email)
             acct = cur.fetchone()
             cur.close()
             if acct:
-                content = "Greetings from aerial estimation, Please find your credentials for login\n" + "Username : " + \
-                          acct[2] + "\nPassword : " + acct[3]
+                # content = "Greetings from aerial estimation, Please find your credentials for
+                # login\n" + "Username : "\
+                #           + acct[2] + "\nPassword : " + acct[3]
                 # mail = smtplib.SMTP('smtp.gmail.com', 587)
                 # mail.ehlo()
                 # mail.starttls()
@@ -4580,14 +3575,7 @@ def getallslider():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('SELECT  * FROM  cart_table WHERE user_id = %s', user_id)
@@ -4627,14 +3615,7 @@ def getallslider():
 @app.route('/api/getallservices', methods=['GET', 'POST'])
 def getallservices():
     if request.method == 'POST':
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('SELECT  * FROM  services WHERE isactive=1')
@@ -4696,14 +3677,7 @@ def getallpaymentmethods():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         a = {}
         grp_list = []
         try:
@@ -4718,7 +3692,7 @@ def getallpaymentmethods():
             a['username'] = personal_wallet_amt[1] + " " + personal_wallet_amt[2]
             cur.close()
             cur = conn.cursor()
-            cur.execute('SELECT group_id , group_name,role FROM user_groups WHERE user_id=%s', (user_id))
+            cur.execute('SELECT group_id , group_name,role FROM user_groups WHERE user_id=%s', user_id)
             usergrp = cur.fetchall()
             if usergrp:
                 for row in usergrp:
@@ -4748,18 +3722,11 @@ def getallusergroups():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         grp_list = []
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM user_groups WHERE user_id=%s', (user_id))
+            cur.execute('SELECT * FROM user_groups WHERE user_id=%s', user_id)
             usergrp = cur.fetchall()
             if usergrp:
                 for row in usergrp:
@@ -4793,14 +3760,7 @@ def createcart():
         service_id = data.get('service_id')
         service_param = data.get('service_param')
         service_param = json.dumps(service_param)
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cart_id = "AER_EST-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -4826,17 +3786,10 @@ def getallcart():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM cart_table WHERE user_id=%s', (user_id))
+            cur.execute('SELECT * FROM cart_table WHERE user_id=%s', user_id)
             user = cur.fetchall()
             cur.close()
             b = []
@@ -4872,14 +3825,7 @@ def createorder():
         user_id = data.get('user_id')
         progress = data.get('progress')
         items = data.get('items')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         order_id = "AER_EST_ORDER-" + str(randrange(10000, 90000))
         for i in range(len(items)):
             try:
@@ -4906,14 +3852,7 @@ def searchuser():
     if request.method == 'POST':
         data = request.get_json()
         email = data.get('email')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             query = ("SELECT * FROM `users` WHERE first_name LIKE '" + email + "%' OR email LIKE '" + email + "';")
@@ -4946,14 +3885,7 @@ def creategroup():
         data = request.get_json()
         group_name = data.get('group_name')
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         group_id = "AER_EST_GRP_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -4981,17 +3913,10 @@ def getallusersingroup():
     if request.method == 'POST':
         data = request.get_json()
         group_id = data.get('group_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM user_groups WHERE group_id=%s', (group_id))
+            cur.execute('SELECT * FROM user_groups WHERE group_id=%s', group_id)
             user = cur.fetchall()
             cur.close()
             b = []
@@ -5023,14 +3948,7 @@ def add_user_into_group():
         group_id = data.get('group_id')
         group_name = data.get('group_name')
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('INSERT INTO user_groups (user_id,group_id,group_name,role) VALUES (%s,%s,%s,%s)',
@@ -5055,14 +3973,7 @@ def deleteusersingroup():
         data = request.get_json()
         user_id = data.get('user_id')
         group_id = data.get('group_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
             cur.execute('DELETE FROM user_groups WHERE user_id=%s AND group_id=%s ', (user_id, group_id))
@@ -5085,17 +3996,10 @@ def deletegroup():
     if request.method == 'POST':
         data = request.get_json()
         group_id = data.get('group_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('DELETE FROM user_groups WHERE group_id =%s', (group_id))
+            cur.execute('DELETE FROM user_groups WHERE group_id =%s', group_id)
             cur.fetchone()
             cur.close()
             return jsonify({
@@ -5119,23 +4023,16 @@ def addmoneyforgroup():
         group_id = data.get('group_id')
         amount = data.get('amount')
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         group_transaction_id = "AER_EST_GRP_TRANS_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM  user_groups WHERE user_id=%s AND role=1', (user_id))
+            cur.execute('SELECT * FROM  user_groups WHERE user_id=%s AND role=1', user_id)
             user = cur.fetchone()
             cur.close()
             if user:
                 cur = conn.cursor()
-                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', (group_id))
+                cur.execute('SELECT amount FROM group_wallet WHERE group_id=%s', group_id)
                 amt = cur.fetchone()
                 upamount = amt[0] + int(amount)
                 cur.close()
@@ -5144,7 +4041,8 @@ def addmoneyforgroup():
                 cur.close()
                 cur = conn.cursor()
                 cur.execute(
-                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,group_user_id) VALUES(%s,%s,%s,%s,%s)',
+                    'INSERT INTO group_wallet_transacctions (group_transaction_id,group_id,amount,transaction_type,'
+                    'group_user_id) VALUES(%s,%s,%s,%s,%s)',
                     (group_transaction_id, group_id, amount, 1, user_id))
                 cur.close()
                 return jsonify({
@@ -5165,17 +4063,10 @@ def getallwallettransaction():
     if request.method == 'POST':
         data = request.get_json()
         group_id = data.get('group_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM group_wallet_transacctions WHERE group_id=%s', (group_id))
+            cur.execute('SELECT * FROM group_wallet_transacctions WHERE group_id=%s', group_id)
             user = cur.fetchall()
             cur.close()
             b = []
@@ -5205,17 +4096,10 @@ def getalltransaction():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM transaction WHERE user_id=%s', (user_id))
+            cur.execute('SELECT * FROM transaction WHERE user_id=%s', user_id)
             user = cur.fetchall()
             cur.close()
             b = []
@@ -5246,14 +4130,7 @@ def createtransaction():
         userid = data.get('user_id')
         transaction_type = data.get('transaction_type')
         amount = data.get('amount')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         transaction_id = "AER_EST_TRANS_ID-" + str(randrange(111111, 999999))
         try:
             cur = conn.cursor()
@@ -5275,9 +4152,9 @@ def createtransaction():
                         "msg": "MONEY ADDED TO  WALLET SUCCESSFULLY"
                     }
                 ), 200
-            elif (transaction_type == 1):
+            elif transaction_type == 1:
                 cur = conn.cursor()
-                cur.execute('SELECT wallet_amount FROM users WHERE email = %s', (userid))
+                cur.execute('SELECT wallet_amount FROM users WHERE email = %s', userid)
                 examount = cur.fetchone()
                 cur.close()
                 upamount = examount[0] - int(amount)
@@ -5306,17 +4183,10 @@ def deletecart():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('DELETE FROM cart_table WHERE id =%s', (user_id))
+            cur.execute('DELETE FROM cart_table WHERE id =%s', user_id)
             cur.fetchone()
             cur.close()
             return jsonify({
@@ -5338,17 +4208,10 @@ def deletecartall():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('DELETE FROM cart_table WHERE user_id =%s', (user_id))
+            cur.execute('DELETE FROM cart_table WHERE user_id =%s', user_id)
             cur.fetchone()
             cur.close()
             return jsonify({
@@ -5370,17 +4233,10 @@ def getallorder():
     if request.method == 'POST':
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM order_table WHERE user_id=%s', (user_id))
+            cur.execute('SELECT * FROM order_table WHERE user_id=%s', user_id)
             user = cur.fetchall()
             cur.close()
             b = []
@@ -5411,14 +4267,7 @@ def getuserlogos():
         logolist = []
         data = request.get_json()
         user_id = data.get('user_id')
-        conn = pymysql.Connect(
-            host="localhost",
-            port=3306,
-            user=DBUserName,
-            password="",
-            db=DBName,
-            autocommit=True
-        )
+        conn = connectMysql()
         cur = conn.cursor()
         cur.execute('SELECT * FROM userlogos WHERE user_id = %s', user_id)
         logos = cur.fetchall()
@@ -5439,14 +4288,7 @@ def uploaduserlogo():
             path = os.path.join(app.config['UPLOAD_FOLDER'], 'userlogouploads', logoimage.filename)
             dounloadurl = "../static/img/userlogouploads/" + logoimage.filename
             logoimage.save(path)
-            conn = pymysql.Connect(
-                host="localhost",
-                port=3306,
-                user=DBUserName,
-                password="",
-                db=DBName,
-                autocommit=True
-            )
+            conn = connectMysql()
             cur = conn.cursor()
             cur.execute('INSERT INTO userlogos (user_id,logo_url) VALUES (%s,%s)', (userid, dounloadurl))
             cur.close()
